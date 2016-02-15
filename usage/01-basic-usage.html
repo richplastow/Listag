@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Listag Basic Usage</title>
+  <link rel=icon href=data:text;base64,Qk0eAAAAAAAAABoAAAAMAAAAAQABAAEAGAAAZhEA>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="usage.css">
+  <script src="../build/listag.js"></script>
+  <script>
+addEventListener('load', function () {
+    var i, l
+
+        //// Micro jQuery. 
+      , $  = document.querySelector.bind(document)
+      , $$ = document.querySelectorAll.bind(document)
+
+        //// Element refs. 
+      , $$actions = $$('#actions .button')
+      , $log      =  $('#log')
+
+        //// Create a listag instance. 
+      , listag = new Listag({
+        })
+
+        //// Reveals the current state of `listag`. 
+      , stringify = function () {
+            $log.innerHTML =
+                'JSON.stringify(listag):\n\n'
+               + JSON.stringify(listag, serializer(), '  ');
+        }
+
+        //// https://github.com/isaacs/json-stringify-safe/blob/master/stringify.js
+      , serializer = function () {
+            var
+                stack = []
+              , keys  = []
+
+              , cycleReplacer = function (key, value) {
+                    if (stack[0] === value) { return '[Circular ~]'; }
+                    return '[Circular ~.' + keys.slice(0, stack.indexOf(value)).join('.') + ']'
+                }
+            ;
+
+            return function (key, value) {
+                if (0 < stack.length) {
+                    var thisPos = stack.indexOf(this);
+                    ~thisPos ? stack.splice(thisPos + 1) : stack.push(this);
+                    ~thisPos ? keys.splice(thisPos, Infinity, key) : keys.push(key);
+                    if (~stack.indexOf(value)) { value = cycleReplacer.call(this, key, value); }
+                } else {
+                    stack.push(value)
+                }
+                return value;
+            }
+        }
+    ;
+
+    //// Enable the action buttons. 
+    for (i=0, l=$$actions.length; i<l; i++) {
+        $$actions[i].addEventListener('click', function (event) {
+            event.preventDefault();
+            try {
+                eval(this.innerHTML);
+            } catch (error) {
+                $log.innerHTML = 'Error:\n\n' + error;
+                return;
+            }
+            stringify();
+        });
+    }
+
+    //// Reveal the initial state of `listag`. 
+    stringify();
+});
+  </script>
+</head>
+<body>
+  <header>
+    <a href="../index.html" title="Listag Homepage">Listag</a><span
+    >/</span><a href="../index.html#/doc/usage" title="Listag Usage">Usage</a><span
+    >/</span><a href="01-basic-usage.html" title="Refresh this page">Basic Usage</a>
+  </header>
+  <main>
+    <nav id="actions">
+      <a href="#" class="button">listag.add();</a><a
+         href="#" class="button">listag.read();</a><a
+         href="#" class="button">listag.browse();</a>
+    </nav>
+    <pre id="log">Loading...</pre>
+  </main>
+  <footer>
+    <a href="http://richplastow.com/" title="Rich Plastow Homepage">Rich Plastow 2016</a>
+  </footer>
+</body>
+</html>
