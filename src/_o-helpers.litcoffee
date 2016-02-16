@@ -82,8 +82,9 @@ Determines whether haystack contains a given needle. @todo arrays and objects
 #### `_o.uid()`
 Xx optional prefix. @todo description
 
-    _o.uid = (p) ->
-      (p||'') + '_' + (Math.random()+'1111111111111111').slice 2, 18
+    _o.uid = (p='id', l=8) ->
+      c = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+      p + '_' + ( c.charAt(Math.floor(Math.random()*62)) while l-- ).join('')
 
 
 

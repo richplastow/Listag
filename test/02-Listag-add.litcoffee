@@ -43,8 +43,12 @@ Prepare a test-instance.
 
 
       "A Listag instance can be recorded in another Listag instance"
-      null
-      (listag) -> listag.add( new Listag ); listag.last.all.last.all
+      100
+      (listag) ->
+        secondListag = new Listag
+        secondListag.x = 100
+        listag.add(secondListag)
+        listag.last.all.x
 
 
 @todo more allowed objects
@@ -190,17 +194,17 @@ Prepare a test-instance.
 
 
       "An array with arbitrary properties"
-      234
+      'leftmost_dog'
       (listag) ->
-        tags = ['cat', 'dog', 'ok123']
+        tags = ['dog', 'ok123']
         tags.thing = 'Unexpected!'
-        listag.add({x:234}, 'def', tags); listag.last.all.x
+        listag.add({x:'leftmost_dog'}, undefined, tags); listag.last.all.x
 
 
       "Can be mixed-case 'aLL'"
-      246
+      'rightmost_dog'
       (listag) ->
-        listag.add({x:246}, 'xyz', ['can', 'be', 'aLL'])
+        listag.add({x:'rightmost_dog'}, 'rightmost_dog', ['cat', 'dog', 'aLL'])
         listag.last.all.x
 
 
@@ -266,45 +270,149 @@ Prepare a test-instance.
       (listag) -> listag.add {}, undefined, ['all', 'is', 'reserved']
 
 
-      "Contains duplicate tags"
+      "Contains duplicate tags at indices 1 and 3"
       """
       /listag/src/Listag.litcoffee Listag::add()
         argument tags[3] is a duplicate of tags[1]"""
       (listag) -> listag.add {}, undefined, ['here', 'again', 'there', 'again']
 
 
+      "Contains many duplicate tags, including indices 0 and 2"
+      """
+      /listag/src/Listag.litcoffee Listag::add()
+        argument tags[2] is a duplicate of tags[0]"""
+      (listag) -> listag.add {}, undefined, ['aa', 'bb', 'aa', 'aa', 'bb']
 
 
-      "`length`, `first`, `last`, `listagL` and `listagR` as expected"
+
+
+      "'all' `length`, `first`, `last`, `listagL` and `listagR` as expected"
       tudor.equal
 
 
-      "The first Item is 'the_first'"
+      "13 nodes created during the '02 Listag::add()' test"
+      13
+      (listag) -> listag.length.all
+
+      "Traversing rightward from `first` takes 13 steps"
+      13
+      (listag) ->
+        i = 0
+        node = listag.first.all
+        while node
+          i++
+          node = node.listagR.all
+        i
+
+      "Traversing leftward from `last` takes 13 steps"
+      13
+      (listag) ->
+        i = 0
+        node = listag.last.all
+        while node
+          i++
+          node = node.listagL.all
+        i
+
+      "Traversing rightward from `aB` takes 9 steps"
+      9
+      (listag) ->
+        i = 0
+        node = listag.nodes.aB
+        while node
+          i++
+          node = node.listagR.all
+        i
+
+      "The leftmost node is 'the_first'"
       'the_first'
       (listag) -> listag.first.all.x
 
-      "The last Item is 'the_last'"
+      "The rightmost node is 'the_last'"
       'the_last'
       (listag) -> listag.last.all.x
 
-      "The first Item’s `listagL` is null"
+      "The leftmost node’s leftward node is null"
       null
       (listag) -> listag.first.all.listagL.all
 
-      "The last Item’s `listagR` is null"
+      "The rightmost node’s rightward node is null"
       null
       (listag) -> listag.last.all.listagR.all
 
-      "The first Item’s `listagR` is 'the_second'"
+      "The leftmost node’s `listagR.all` is 'the_second'"
       'the_second'
       (listag) -> listag.first.all.listagR.all.x
 
-      "The last Item’s `listagL` is 'second_from_last'"
+      "The rightmost node’s `listagL.all` is 'second_from_last'"
       'second_from_last'
-      (listag) -> listag.last.all.listagL.all.x
+      (listag) ->
+        listag.last.all.listagL.all.x
 
 
 
+
+      "'dog' `length`, `first`, `last`, `listagL` and `listagR` as expected"
+
+      "2 'dog' nodes created during the '02 Listag::add()' test"
+      2
+      (listag) -> listag.length.dog
+
+      "Traversing dogs rightward from the leftmost dog takes 2 steps"
+      2
+      (listag) ->
+        i = 0
+        node = listag.first.dog
+        while node
+          i++
+          node = node.listagR.dog
+        i
+
+      "Traversing dogs leftward from the rightmost dog takes 2 steps"
+      2
+      (listag) ->
+        i = 0
+        node = listag.last.dog
+        while node
+          i++
+          node = node.listagL.dog
+        i
+
+      "Traversing dogs rightward from `rightmost_dog` takes 1 steps"
+      1
+      (listag) ->
+        i = 0
+        node = listag.nodes.rightmost_dog
+        _o 
+        while node
+          i++
+          node = node.listagR.dog
+        i
+
+      "The leftmost dog node is 'leftmost_dog'"
+      'leftmost_dog'
+      (listag) -> listag.first.dog.x
+
+      "The rightmost dog node is 'rightmost_dog'"
+      'rightmost_dog'
+      (listag) -> listag.last.dog.x
+
+      "The leftmost dog’s leftward dog is null"
+      null
+      (listag) -> listag.first.dog.listagL.dog
+
+      "The rightmost dog’s rightward dog is null"
+      null
+      (listag) -> listag.last.dog.listagR.dog
+
+      "The leftmost dog’s `listagR.dog` is 'rightmost_dog'"
+      'rightmost_dog'
+      (listag) -> listag.first.dog.listagR.dog.x
+
+      "The rightmost dog’s `listagL.dog` is 'leftmost_dog'"
+      'leftmost_dog'
+      (listag) ->
+        listag.last.dog.listagL.dog.x
 
     ];
 

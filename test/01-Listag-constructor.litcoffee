@@ -61,29 +61,17 @@ Prepare a test-instance.
       0
       (listag) -> Object.keys( listag.nodes ).length
 
-      "`Listag::length` contains one property..."
-      1
+      "`Listag::length` is empty"
+      0
       (listag) -> Object.keys( listag.length ).length
 
-      "...`Listag::length.all`, which is 0"
+      "`Listag::first` is empty"
       0
-      (listag) -> listag.length.all
-
-      "`Listag::first` contains one property..."
-      1
       (listag) -> Object.keys( listag.first ).length
 
-      "...`Listag::first.all`, which is null"
-      null
-      (listag) -> listag.first.all
-
-      "`Listag::last` contains one property..."
-      1
+      "`Listag::last` is empty"
+      0
       (listag) -> Object.keys( listag.last ).length
-
-      "...`Listag::last.all`, which is null"
-      null
-      (listag) -> listag.last.all
 
 
 
