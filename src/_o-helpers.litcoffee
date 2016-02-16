@@ -110,6 +110,124 @@ Convert a property to one of XX kinds:
           Object.defineProperty obj, name, { value:value, enumerable:false }
 
 
+
+
+#### `_o.vArray()`
+- `M <string>`            a method-name prefix to add to exception messages
+- `arr <array>`           the array which contains the values to validate
+- `signature <string>`    type and rules for elements
+- `fallback <array>`      (optional) a value to use if the array is empty
+- `<array>`               returns the valid array
+
+Validates an array. 
+
+    _o.vArray = (M, arr, signature, fallback) ->
+
+Get `types` and `rule` from the signature. 
+
+        matches = signature.match /^<array of ([|a-z]+)\s*(.*)>$/i
+        if ! matches then throw RangeError "/listag/src/_o-helpers.litcoffee
+          _o.vArray()\n  signature #{signature} is invalid"
+        [signature, types, rule] = matches
+
+Use the fallback, if needed. 
+
+        if ! arr then return fallback
+
+Step through each element in `arr`, and get its value’s type. 
+
+        if _o.A != _o.type arr then throw RangeError M +
+          " is type #{_o.type arr} not array"
+
+        for value,i in arr
+          tv = _o.type value
+
+Check the type and rule. 
+
+          pass = false
+          for type in types.split '|'
+            if (_o.N == type or _o.I == type) and _o.N == tv
+              if _o.I == type and value % 1
+                throw RangeError M + "[#{i}] is a number but not an integer"
+              if rule
+                [min, max] = rule.split '-'
+                if value < min or value > max
+                  throw RangeError M + "[#{i}] is #{value} (must be #{rule})"
+              pass = true
+              break
+            if type == tv
+              if _o.S == tv and rule
+                unless RegExp(rule).test value
+                  throw RangeError M + "[#{i}] fails #{rule}"
+              pass = true
+              break
+            if /^[A-Z]/.test type
+              if _o.O == tv
+                if eval "value instanceof #{type}" #@todo refactor to avoid `eval()`
+                  pass = true
+                  break
+
+          if pass then continue
+          throw TypeError M + "[#{i}] is type #{tv} not #{types}"
+
+
+
+
+#### `_o.validator()`
+- `M <string>`            a method-name prefix to add to exception messages
+- `obj <object>`          the object which contains the values to validate
+- `<function>`            the validator, which determines a property’s validity
+  - `signature <string>`  the value’s name and type
+  - `fallback <mixed>`    (optional) a value to use if `opt[key]` is undefined
+  - `<mixed>`             returns the valid value
+
+Creates a custom validator. 
+
+    _o.validator = (M, obj) ->
+
+      (signature, fallback) ->
+
+Get `key`, `types` and `rule` from the signature. 
+
+        matches = signature.match /^([_a-z][_a-z0-9]*)\s+<([|a-z]+)\s*(.*)>$/i
+        if ! matches then throw RangeError "/listag/src/_o-helpers.litcoffee
+          _o.validator()\n  signature #{signature} is invalid"
+        [signature, key, types, rule] = matches
+
+Use the fallback, if needed. 
+
+        value = obj[key]
+        tv = _o.type value
+        if _o.U == tv
+          if 2 == arguments.length then return fallback
+          throw TypeError M + key + " is undefined and has no fallback"
+
+Check the type and rule. 
+
+        for type in types.split '|'
+          if (_o.N == type or _o.I == type) and _o.N == tv
+            if _o.I == type and value % 1
+              throw RangeError M + key + " is a number but not an integer"
+            if rule
+              [min, max] = rule.split '-'
+              if value < min or value > max
+                throw RangeError M + key + " is #{value} (must be #{rule})"
+            return value
+          if type == tv
+            if _o.S == tv and rule
+              unless RegExp(rule).test value
+                throw RangeError M + key + " fails #{rule}"
+            return value
+          if /^[A-Z]/.test type
+            if _o.O == tv
+              if eval "value instanceof #{type}" #@todo refactor to avoid `eval()`
+                return value
+
+        throw TypeError M + key + " is type #{tv} not #{types}"
+
+
+
+
     ;
 
 
