@@ -35,7 +35,7 @@ Listag = (function() {
   }
 
   Listag.prototype.add = function(node, id, tags) {
-    var M, v;
+    var M, i, j, len, ref, tag, tmp, v;
     M = "/listag/src/Listag.litcoffee Listag::add()\n  ";
     v = _o.validator(M + "argument ", {
       node: node,
@@ -46,7 +46,19 @@ Listag = (function() {
     if (!_o.isU(this.nodes[id])) {
       throw RangeError(M + ("a node with id '" + id + "' already exists"));
     }
-    tags = _o.vArray(M + "argument tags", tags, '<array of string ^[a-z]\\w{1,23}$>', []);
+    _o.vArray(M + "argument tags", tags, '<array of string ^[a-z]\\w{1,23}$>', []);
+    tmp = {};
+    ref = tags || [];
+    for (i = j = 0, len = ref.length; j < len; i = ++j) {
+      tag = ref[i];
+      if ('all' === tag) {
+        throw RangeError(M + ("argument tags[" + i + "] is the special tag 'all'"));
+      }
+      if (tmp[tag]) {
+        throw RangeError(M + ("argument tags[" + i + "] is a duplicate of tags[" + tmp[tag] + "]"));
+      }
+      tmp[tag] = i;
+    }
     node.listagL = this.length.all ? {
       all: this.last.all
     } : {

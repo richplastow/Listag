@@ -36,7 +36,7 @@ Listag = (function() {
   }
 
   Listag.prototype.add = function(node, id, tags) {
-    var M, v;
+    var M, i, j, len, ref, tag, tmp, v;
     M = "/listag/src/Listag.litcoffee Listag::add()\n  ";
     v = _o.validator(M + "argument ", {
       node: node,
@@ -47,7 +47,19 @@ Listag = (function() {
     if (!_o.isU(this.nodes[id])) {
       throw RangeError(M + ("a node with id '" + id + "' already exists"));
     }
-    tags = _o.vArray(M + "argument tags", tags, '<array of string ^[a-z]\\w{1,23}$>', []);
+    _o.vArray(M + "argument tags", tags, '<array of string ^[a-z]\\w{1,23}$>', []);
+    tmp = {};
+    ref = tags || [];
+    for (i = j = 0, len = ref.length; j < len; i = ++j) {
+      tag = ref[i];
+      if ('all' === tag) {
+        throw RangeError(M + ("argument tags[" + i + "] is the special tag 'all'"));
+      }
+      if (tmp[tag]) {
+        throw RangeError(M + ("argument tags[" + i + "] is a duplicate of tags[" + tmp[tag] + "]"));
+      }
+      tmp[tag] = i;
+    }
     node.listagL = this.length.all ? {
       all: this.last.all
     } : {
@@ -762,11 +774,16 @@ tudor.add([
     return listag.last.all.x;
   }, "An array with arbitrary properties", 234, function(listag) {
     var tags;
-    tags = ['cat', 'dog'];
+    tags = ['cat', 'dog', 'ok123'];
     tags.thing = 'Unexpected!';
     listag.add({
       x: 234
     }, 'def', tags);
+    return listag.last.all.x;
+  }, "Can be mixed-case 'aLL'", 246, function(listag) {
+    listag.add({
+      x: 246
+    }, 'xyz', ['can', 'be', 'aLL']);
     return listag.last.all.x;
   }, "Can be undefined", 'second_from_last', function(listag) {
     listag.add({
@@ -784,8 +801,14 @@ tudor.add([
     return listag.add({}, void 0, ['ok', 'fine', 123456, 'uh_oh']);
   }, "Contains an empty string", "/listag/src/Listag.litcoffee Listag::add()\n  argument tags[3] fails ^[a-z]\\w{1,23}$", function(listag) {
     return listag.add({}, void 0, ['no', 'empties', 'allowed', '']);
-  }, "Contains an invalid string", "/listag/src/Listag.litcoffee Listag::add()\n  argument tags[0] fails ^[a-z]\\w{1,23}$", function(listag) {
+  }, "Contains a string starting with a digit", "/listag/src/Listag.litcoffee Listag::add()\n  argument tags[0] fails ^[a-z]\\w{1,23}$", function(listag) {
     return listag.add({}, void 0, ['123abc', 'nope']);
+  }, "Contains a string starting with an uppercase letter", "/listag/src/Listag.litcoffee Listag::add()\n  argument tags[3] fails ^[a-z]\\w{1,23}$", function(listag) {
+    return listag.add({}, void 0, ['must', 'be', 'only', 'Lowercase']);
+  }, "Contains the special string 'all'", "/listag/src/Listag.litcoffee Listag::add()\n  argument tags[0] is the special tag 'all'", function(listag) {
+    return listag.add({}, void 0, ['all', 'is', 'reserved']);
+  }, "Contains duplicate tags", "/listag/src/Listag.litcoffee Listag::add()\n  argument tags[3] is a duplicate of tags[1]", function(listag) {
+    return listag.add({}, void 0, ['here', 'again', 'there', 'again']);
   }, "`length`, `first`, `last`, `listagL` and `listagR` as expected", tudor.equal, "The first Item is 'the_first'", 'the_first', function(listag) {
     return listag.first.all.x;
   }, "The last Item is 'the_last'", 'the_last', function(listag) {

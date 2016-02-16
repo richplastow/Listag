@@ -54,7 +54,7 @@ Methods
 #### `add()`
 - `node <object>`           `listagL/R` properties will be added to this
 - `id <string>`             (optional) an identifier (generated if missing)
-- `tags <array of string>`  (optional) any number of tags, except 'all'
+- `tags <array of string>`  (optional) @todo prevent the special string 'all'
 - `<string>`                returns the newly-added object’s identifier
 
 Records an object in `nodes`. 
@@ -72,8 +72,16 @@ Check that the arguments are ok, and that `id` is unique.
         unless _o.isU @nodes[id] then throw RangeError M + "
           a node with id '#{id}' already exists"
 
-        tags = _o.vArray M + "argument tags", tags, 
+        _o.vArray M + "argument tags", tags, 
           '<array of string ^[a-z]\\w{1,23}$>', []
+
+        tmp = {}
+        for tag,i in (tags || [])
+          if 'all' == tag then throw RangeError M + "
+            argument tags[#{i}] is the special tag 'all'"
+          if tmp[tag] then throw  RangeError M + "
+            argument tags[#{i}] is a duplicate of tags[#{tmp[tag]}]"
+          tmp[tag] = i
 
 Apply the `listagL` and `listagR` object properties. 
 

@@ -192,9 +192,16 @@ Prepare a test-instance.
       "An array with arbitrary properties"
       234
       (listag) ->
-        tags = ['cat', 'dog']
+        tags = ['cat', 'dog', 'ok123']
         tags.thing = 'Unexpected!'
         listag.add({x:234}, 'def', tags); listag.last.all.x
+
+
+      "Can be mixed-case 'aLL'"
+      246
+      (listag) ->
+        listag.add({x:246}, 'xyz', ['can', 'be', 'aLL'])
+        listag.last.all.x
 
 
       "Can be undefined"
@@ -238,11 +245,32 @@ Prepare a test-instance.
       (listag) -> listag.add {}, undefined, ['no', 'empties', 'allowed', '']
 
 
-      "Contains an invalid string"
+      "Contains a string starting with a digit"
       """
       /listag/src/Listag.litcoffee Listag::add()
         argument tags[0] fails ^[a-z]\\w{1,23}$"""
       (listag) -> listag.add {}, undefined, ['123abc', 'nope']
+
+
+      "Contains a string starting with an uppercase letter"
+      """
+      /listag/src/Listag.litcoffee Listag::add()
+        argument tags[3] fails ^[a-z]\\w{1,23}$"""
+      (listag) -> listag.add {}, undefined, ['must', 'be', 'only', 'Lowercase']
+
+
+      "Contains the special string 'all'"
+      """
+      /listag/src/Listag.litcoffee Listag::add()
+        argument tags[0] is the special tag 'all'"""
+      (listag) -> listag.add {}, undefined, ['all', 'is', 'reserved']
+
+
+      "Contains duplicate tags"
+      """
+      /listag/src/Listag.litcoffee Listag::add()
+        argument tags[3] is a duplicate of tags[1]"""
+      (listag) -> listag.add {}, undefined, ['here', 'again', 'there', 'again']
 
 
 
