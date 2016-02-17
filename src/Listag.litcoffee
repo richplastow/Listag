@@ -33,16 +33,16 @@ Contains all objects currently held by this Listag instance.
         @length = {}
 
 
-#### `first <object>`
+#### `head <object>`
 @todo describe
 
-        @first = {}
+        @head = {}
 
 
-#### `last <object>`
+#### `tail <object>`
 @todo describe
 
-        @last = {}
+        @tail = {}
 
 
 
@@ -89,17 +89,17 @@ Apply the `listagL` and `listagR` object properties.
         node.listagL = node.listagL || {}
         node.listagR = node.listagR || {}
         for tag in tags
-          node.listagL[tag] = if @length[tag] then @last[tag] else null
+          node.listagL[tag] = if @length[tag] then @tail[tag] else null
           node.listagR[tag] = null
 
 Append the new object to `nodes`. 
 
           if @length[tag]
-            @last[tag].listagR[tag] = node
+            @tail[tag].listagR[tag] = node
           else
-            @first[tag] = node
+            @head[tag] = node
             @length[tag] = 0
-          @last[tag] = node
+          @tail[tag] = node
           @length[tag]++
 
 Allow the node to be accessed by `id`, and return the `id`. 

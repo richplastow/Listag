@@ -38,13 +38,13 @@ Prepare a test-instance.
       _o.O
       (listag) -> listag.length
 
-      "`Listag::first` is an object"
+      "`Listag::head` is an object"
       _o.O
-      (listag) -> listag.first
+      (listag) -> listag.head
 
-      "`Listag::last` is an object"
+      "`Listag::tail` is an object"
       _o.O
-      (listag) -> listag.last
+      (listag) -> listag.tail
 
 
       tudor.equal
@@ -65,13 +65,13 @@ Prepare a test-instance.
       0
       (listag) -> Object.keys( listag.length ).length
 
-      "`Listag::first` is empty"
+      "`Listag::head` is empty"
       0
-      (listag) -> Object.keys( listag.first ).length
+      (listag) -> Object.keys( listag.head ).length
 
-      "`Listag::last` is empty"
+      "`Listag::tail` is empty"
       0
-      (listag) -> Object.keys( listag.last ).length
+      (listag) -> Object.keys( listag.tail ).length
 
 
 
