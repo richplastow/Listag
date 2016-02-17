@@ -27,10 +27,10 @@ Contains all Node instances currently held by this Listag instance.
         @nodes = {}
 
 
-#### `length <object>`
+#### `total <object>`
 @todo describe
 
-        @length = {}
+        @total = {}
 
 
 #### `head <object>`
@@ -52,9 +52,9 @@ Methods
 
 
 #### `add()`
-- `cargo <any>`             @todo describe
+- `cargo <any>`             the new Node’s payload, can be any type
 - `id <string>`             (optional) an identifier (generated if missing)
-- `tags <array of string>`  (optional) @todo prevent the special string 'all'
+- `tags <array of string>`  (optional) must not be the special string 'node'
 - `<string>`                returns the newly-added object’s identifier
 
 Creates a new Node instance in `nodes`. 
@@ -66,7 +66,7 @@ Creates a new Node instance in `nodes`.
 Check that the arguments are ok, and that `id` is unique. 
 
         v  = _o.validator M + "argument ", { id:id }
-        id = v 'id <string ^[a-z]\\w{1,23}$>', _o.uid _o.type cargo
+        id = v 'id <string ^[a-z]\\w{1,23}$>', _o.uid()
 
         unless _o.isU @nodes[id] then throw RangeError M + "
           a node with id '#{id}' already exists"
@@ -76,29 +76,29 @@ Check that the arguments are ok, and that `id` is unique.
 
         tmp = {}
         for tag,i in tags
-          if 'all' == tag then throw RangeError M + "
-            argument tags[#{i}] is the special tag 'all'"
+          if 'node' == tag then throw RangeError M + "
+            argument tags[#{i}] is the special tag 'node'"
           unless _o.isU tmp[tag] then throw RangeError M + "
             argument tags[#{i}] is a duplicate of tags[#{tmp[tag]}]"
           tmp[tag] = i
 
 Create a new Node instance, and fill the `previous` and `next` properties. 
 
-        tags.push 'all' # every node has the special 'all' tag
+        tags.push 'node' # every node has the special 'node' tag
         node = new Node cargo
         for tag in tags
-          node.previous[tag] = if @length[tag] then @tail[tag] else null
+          node.previous[tag] = if @total[tag] then @tail[tag] else null
           node.next[tag] = null
 
 Append the new Node instance to `nodes`. 
 
-          if @length[tag]
+          if @total[tag]
             @tail[tag].next[tag] = node
           else
             @head[tag] = node
-            @length[tag] = 0
+            @total[tag] = 0
           @tail[tag] = node
-          @length[tag]++
+          @total[tag]++
 
 Allow the node to be accessed by `id`, and return the `id`. 
 

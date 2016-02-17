@@ -1,5 +1,5 @@
 01 Listag Constructor
-=======================
+=====================
 
 
     tudor.add [
@@ -34,9 +34,9 @@ Prepare a test-instance.
       _o.O
       (listag) -> listag.nodes
 
-      "`Listag::length` is an object"
+      "`Listag::total` is an object"
       _o.O
-      (listag) -> listag.length
+      (listag) -> listag.total
 
       "`Listag::head` is an object"
       _o.O
@@ -61,9 +61,9 @@ Prepare a test-instance.
       0
       (listag) -> Object.keys( listag.nodes ).length
 
-      "`Listag::length` is empty"
+      "`Listag::total` is empty"
       0
-      (listag) -> Object.keys( listag.length ).length
+      (listag) -> Object.keys( listag.total ).length
 
       "`Listag::head` is empty"
       0
