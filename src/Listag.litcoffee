@@ -65,14 +65,14 @@ Creates a new Node instance in `nodes`.
 
 Check that the arguments are ok, and that `id` is unique. 
 
-        v  = _o.validator M + "argument ", { id:id }
-        id = v 'id <string ^[a-z]\\w{1,23}$>', _o.uid()
+        id = id || _o.uid()
+        _o.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
 
         unless _o.isU @nodes[id] then throw RangeError M + "
           a node with id '#{id}' already exists"
 
         _o.vArray M + "argument tags", tags,
-          '<array of string ^[a-z]\\w{1,23}$>', []
+          "<array of string #{TAG_RULE}>", []
 
         tmp = {}
         for tag,i in tags
@@ -110,7 +110,7 @@ Allow the node to be accessed by `id`, and return the `id`.
 
 #### `read()`
 - `id <string>`             an identifier, unique within this Listag
-- `<object>`                returns a reference to the node
+- `<any>`                   returns the node’s `cargo`
 
 Retrieves a node’s cargo. 
 
@@ -118,16 +118,17 @@ Retrieves a node’s cargo.
         M = "/listag/src/Listag.litcoffee
           Listag::read()\n  "
 
-Check that `id` is valid. 
+Look up the Node, and check that `id` is valid. 
 
-        _o.validator(M + "argument ", { id:id })('id <string ^[a-z]\\w{1,23}$>')
         node = @nodes[id]
-        if _o.isU node then throw RangeError M + "
-          the node with id '#{id}' does not exist"
+        if _o.isU node
+          _o.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
+          throw RangeError M + "
+            the node with id '#{id}' does not exist"
 
-Return the object. 
+Return the cargo. 
 
-        return node
+        return node.cargo
 
 
 
@@ -158,6 +159,24 @@ Namespaced Functions
     Listag.xx = (yy) ->
       M = "/listag/src/Listag.litcoffee
         Listag.xx()\n  "
+
+
+
+
+Private Constants
+-----------------
+
+
+#### `ID_RULE <string>`
+Validates the `id` argument. 
+
+    ID_RULE = '^[a-z]\\w{1,23}$'
+
+
+#### `TAG_RULE <string>`
+Validates tags. 
+
+    TAG_RULE = '^[a-z]\\w{1,23}$'
 
 
 
