@@ -34,12 +34,12 @@ Prepare a test-instance.
 
       "A simple object is recorded"
       'the_second'
-      (listag) -> listag.add({x:'the_second'}); listag.tail.all.x
+      (listag) -> listag.add({x:'the_second'}); listag.tail.all.cargo.x
 
 
       "A Listag instance can be recorded in itself"
       'the_second'
-      (listag) -> listag.add(listag); listag.tail.all.listagL.all.x
+      (listag) -> listag.add(listag); listag.tail.all.previous.all.cargo.x
 
 
       "A Listag instance can be recorded in another Listag instance"
@@ -48,40 +48,13 @@ Prepare a test-instance.
         secondListag = new Listag
         secondListag.x = 100
         listag.add(secondListag)
-        listag.tail.all.x
+        listag.tail.all.cargo.x
 
 
 @todo more allowed objects
 
 
 
-
-      "`node` exceptions"
-      tudor.throw
-
-
-      "`node` not provided"
-      """
-      /listag/src/Listag.litcoffee Listag::add()
-        argument node is undefined and has no fallback"""
-      (listag) -> listag.add()
-
-
-      "`node` is null"
-      """
-      /listag/src/Listag.litcoffee Listag::add()
-        argument node is type null not object"""
-      (listag) -> listag.add null
-
-
-      "`node` is a Date object"
-      """
-      /listag/src/Listag.litcoffee Listag::add()
-        argument node is type date not object"""
-      (listag) -> listag.add new Date()
-
-
-@todo more objects exceptions
 
 
 
@@ -94,21 +67,21 @@ Prepare a test-instance.
       11
       (listag) ->
         listag.add {x:11}, 'aB'
-        listag.tail.all.x
+        listag.tail.all.cargo.x
 
 
       "Longest possible id"
       22
       (listag) ->
         listag.add {x:22}, 'abcdefghijklmnopqrst123_'
-        listag.tail.all.x
+        listag.tail.all.cargo.x
 
 
       "Can repeat existing id, if case is different"
       33
       (listag) ->
         listag.add {x:33}, 'aBcDeFgHiJkLmNoPqRsT123_'
-        listag.tail.all.x
+        listag.tail.all.cargo.x
 
 
 
@@ -190,7 +163,7 @@ Prepare a test-instance.
 
       "An empty array"
       789
-      (listag) -> listag.add({x:789}, 'abc', []); listag.tail.all.x
+      (listag) -> listag.add({x:789}, 'abc', []); listag.tail.all.cargo.x
 
 
       "An array with arbitrary properties"
@@ -198,28 +171,28 @@ Prepare a test-instance.
       (listag) ->
         tags = ['dog', 'ok123']
         tags.thing = 'Unexpected!'
-        listag.add({x:'leftmost_dog'}, undefined, tags); listag.tail.all.x
+        listag.add({x:'leftmost_dog'}, undefined, tags); listag.tail.all.cargo.x
 
 
       "Can be mixed-case 'aLL'"
       'rightmost_dog'
       (listag) ->
         listag.add({x:'rightmost_dog'}, 'rightmost_dog', ['cat', 'dog', 'aLL'])
-        listag.tail.all.x
+        listag.tail.all.cargo.x
 
 
       "Can be undefined"
       'second_from_last'
       (listag) ->
         listag.add({x:'second_from_last'}, 'ghi', undefined)
-        listag.tail.all.x
+        listag.tail.all.cargo.x
 
 
       "Can be null"
       'the_last'
       (listag) ->
         listag.add({x:'the_last'}, 'klm', null)
-        listag.tail.all.x
+        listag.tail.all.cargo.x
 
 
 
@@ -286,7 +259,7 @@ Prepare a test-instance.
 
 
 
-      "'all' `length`, `head`, `tail`, `listagL` and `listagR` as expected"
+      "'all' `length`, `head`, `tail`, `previous` and `next` as expected"
       tudor.equal
 
 
@@ -301,7 +274,7 @@ Prepare a test-instance.
         node = listag.head.all
         while node
           i++
-          node = node.listagR.all
+          node = node.next.all
         i
 
       "Traversing leftward from `tail` takes 13 steps"
@@ -311,7 +284,7 @@ Prepare a test-instance.
         node = listag.tail.all
         while node
           i++
-          node = node.listagL.all
+          node = node.previous.all
         i
 
       "Traversing rightward from `aB` takes 9 steps"
@@ -321,38 +294,38 @@ Prepare a test-instance.
         node = listag.nodes.aB
         while node
           i++
-          node = node.listagR.all
+          node = node.next.all
         i
 
       "The leftmost node is 'the_first'"
       'the_first'
-      (listag) -> listag.head.all.x
+      (listag) -> listag.head.all.cargo.x
 
       "The rightmost node is 'the_last'"
       'the_last'
-      (listag) -> listag.tail.all.x
+      (listag) -> listag.tail.all.cargo.x
 
       "The leftmost node’s leftward node is null"
       null
-      (listag) -> listag.head.all.listagL.all
+      (listag) -> listag.head.all.previous.all
 
       "The rightmost node’s rightward node is null"
       null
-      (listag) -> listag.tail.all.listagR.all
+      (listag) -> listag.tail.all.next.all
 
-      "The leftmost node’s `listagR.all` is 'the_second'"
+      "The leftmost node’s `next.all` is 'the_second'"
       'the_second'
-      (listag) -> listag.head.all.listagR.all.x
+      (listag) -> listag.head.all.next.all.cargo.x
 
-      "The rightmost node’s `listagL.all` is 'second_from_last'"
+      "The rightmost node’s `previous.all` is 'second_from_last'"
       'second_from_last'
       (listag) ->
-        listag.tail.all.listagL.all.x
+        listag.tail.all.previous.all.cargo.x
 
 
 
 
-      "'dog' `length`, `head`, `tail`, `listagL` and `listagR` as expected"
+      "'dog' `length`, `head`, `tail`, `previous` and `next` as expected"
 
       "2 'dog' nodes created during the '02 Listag::add()' test"
       2
@@ -365,7 +338,7 @@ Prepare a test-instance.
         node = listag.head.dog
         while node
           i++
-          node = node.listagR.dog
+          node = node.next.dog
         i
 
       "Traversing dogs leftward from the rightmost dog takes 2 steps"
@@ -375,7 +348,7 @@ Prepare a test-instance.
         node = listag.tail.dog
         while node
           i++
-          node = node.listagL.dog
+          node = node.previous.dog
         i
 
       "Traversing dogs rightward from `rightmost_dog` takes 1 steps"
@@ -386,33 +359,33 @@ Prepare a test-instance.
         _o 
         while node
           i++
-          node = node.listagR.dog
+          node = node.next.dog
         i
 
       "The leftmost dog node is 'leftmost_dog'"
       'leftmost_dog'
-      (listag) -> listag.head.dog.x
+      (listag) -> listag.head.dog.cargo.x
 
       "The rightmost dog node is 'rightmost_dog'"
       'rightmost_dog'
-      (listag) -> listag.tail.dog.x
+      (listag) -> listag.tail.dog.cargo.x
 
       "The leftmost dog’s leftward dog is null"
       null
-      (listag) -> listag.head.dog.listagL.dog
+      (listag) -> listag.head.dog.previous.dog
 
       "The rightmost dog’s rightward dog is null"
       null
-      (listag) -> listag.tail.dog.listagR.dog
+      (listag) -> listag.tail.dog.next.dog
 
-      "The leftmost dog’s `listagR.dog` is 'rightmost_dog'"
+      "The leftmost dog’s `next.dog` is 'rightmost_dog'"
       'rightmost_dog'
-      (listag) -> listag.head.dog.listagR.dog.x
+      (listag) -> listag.head.dog.next.dog.cargo.x
 
-      "The rightmost dog’s `listagL.dog` is 'leftmost_dog'"
+      "The rightmost dog’s `previous.dog` is 'leftmost_dog'"
       'leftmost_dog'
       (listag) ->
-        listag.tail.dog.listagL.dog.x
+        listag.tail.dog.previous.dog.cargo.x
 
     ];
 

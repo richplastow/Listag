@@ -22,7 +22,7 @@ Properties
 
 
 #### `nodes <object>`
-Contains all objects currently held by this Listag instance. 
+Contains all Node instances currently held by this Listag instance. 
 
         @nodes = {}
 
@@ -52,22 +52,21 @@ Methods
 
 
 #### `add()`
-- `node <object>`           `listagL/R` properties will be added to this
+- `cargo <any>`             @todo describe
 - `id <string>`             (optional) an identifier (generated if missing)
 - `tags <array of string>`  (optional) @todo prevent the special string 'all'
 - `<string>`                returns the newly-added object’s identifier
 
-Records an object in `nodes`. 
+Creates a new Node instance in `nodes`. 
 
-      add: (node, id, tags=[]) ->
+      add: (cargo, id, tags=[]) ->
         M = "/listag/src/Listag.litcoffee
           Listag::add()\n  "
 
 Check that the arguments are ok, and that `id` is unique. 
 
-        v = _o.validator M + "argument ", { node:node, id:id }
-        node = v 'node <object>'
-        id   = v 'id <string ^[a-z]\\w{1,23}$>', _o.uid _o.type node
+        v  = _o.validator M + "argument ", { id:id }
+        id = v 'id <string ^[a-z]\\w{1,23}$>', _o.uid _o.type cargo
 
         unless _o.isU @nodes[id] then throw RangeError M + "
           a node with id '#{id}' already exists"
@@ -83,19 +82,18 @@ Check that the arguments are ok, and that `id` is unique.
             argument tags[#{i}] is a duplicate of tags[#{tmp[tag]}]"
           tmp[tag] = i
 
-Apply the `listagL` and `listagR` object properties. 
+Create a new Node instance, and fill the `previous` and `next` properties. 
 
         tags.push 'all' # every node has the special 'all' tag
-        node.listagL = node.listagL || {}
-        node.listagR = node.listagR || {}
+        node = new Node cargo
         for tag in tags
-          node.listagL[tag] = if @length[tag] then @tail[tag] else null
-          node.listagR[tag] = null
+          node.previous[tag] = if @length[tag] then @tail[tag] else null
+          node.next[tag] = null
 
-Append the new object to `nodes`. 
+Append the new Node instance to `nodes`. 
 
           if @length[tag]
-            @tail[tag].listagR[tag] = node
+            @tail[tag].next[tag] = node
           else
             @head[tag] = node
             @length[tag] = 0
@@ -114,7 +112,7 @@ Allow the node to be accessed by `id`, and return the `id`.
 - `id <string>`             an identifier, unique within this Listag
 - `<object>`                returns a reference to the node
 
-Retrieves an object from `nodes`. 
+Retrieves a node’s cargo. 
 
       read: (id) ->
         M = "/listag/src/Listag.litcoffee
