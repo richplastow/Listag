@@ -1,5 +1,5 @@
 Listag
-========
+======
 
 @todo describe
 
@@ -72,7 +72,7 @@ Check that the arguments are ok, and that `id` is unique.
         unless _o.isU @nodes[id] then throw RangeError M + "
           a node with id '#{id}' already exists"
 
-        _o.vArray M + "argument tags", tags, 
+        _o.vArray M + "argument tags", tags,
           '<array of string ^[a-z]\\w{1,23}$>', []
 
         tmp = {}
@@ -102,10 +102,34 @@ Append the new object to `nodes`.
           @last[tag] = node
           @length[tag]++
 
-Allow the node to be accesed by `id`, and return the `id`. 
+Allow the node to be accessed by `id`, and return the `id`. 
 
         @nodes[id] = node
         return id
+
+
+
+
+#### `read()`
+- `id <string>`             an identifier, unique within this Listag
+- `<object>`                returns a reference to the node
+
+Retrieves an object from `nodes`. 
+
+      read: (id) ->
+        M = "/listag/src/Listag.litcoffee
+          Listag::read()\n  "
+
+Check that `id` is valid. 
+
+        _o.validator(M + "argument ", { id:id })('id <string ^[a-z]\\w{1,23}$>')
+        node = @nodes[id]
+        if _o.isU node then throw RangeError M + "
+          the node with id '#{id}' does not exist"
+
+Return the object. 
+
+        return node
 
 
 
