@@ -63,5 +63,14 @@ Generated during the build-process and injected into app-scope.
 
 
 
+
+The Privacy Constant
+--------------------
+
+Provides an unguessable prefix for private instance members. 
+
+    _o._ = (''+Math.random()).substr 2
+
+
     ;
 

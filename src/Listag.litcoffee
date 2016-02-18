@@ -14,17 +14,13 @@ Listag
         M = "/listag/src/Listag.litcoffee
           Listag()\n  "
 
+        _o.define @, _o._, {}, 'hid'
 
 
 
-Properties
-----------
 
-
-#### `nodes <object>`
-Contains all Node instances currently held by this Listag instance. 
-
-        @nodes = {}
+Public Properties
+-----------------
 
 
 #### `total <object>`
@@ -43,6 +39,18 @@ Contains all Node instances currently held by this Listag instance.
 @todo describe
 
         @tail = {}
+
+
+
+
+Private Properties
+------------------
+
+
+#### `_nodes <object>`
+Contains all Node instances currently held by this Listag instance. 
+
+        @[_o._]._nodes = {}
 
 
 
@@ -68,7 +76,7 @@ Check that the arguments are ok, and that `id` is unique.
         id = id || _o.uid()
         _o.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
 
-        unless _o.isU @nodes[id] then throw RangeError M + "
+        unless _o.isU @[_o._]._nodes[id] then throw RangeError M + "
           a node with id '#{id}' already exists"
 
         _o.vArray M + "argument tags", tags,
@@ -102,15 +110,15 @@ Append the new Node instance to `nodes`.
 
 Allow the node to be accessed by `id`, and return the `id`. 
 
-        @nodes[id] = node
+        @[_o._]._nodes[id] = node
         return id
 
 
 
 
 #### `read()`
-- `id <string>`             an identifier, unique within this Listag
-- `<any>`                   returns the node’s `cargo`
+- `id <string>`  an identifier, unique within this Listag
+- `<any>`        returns the node’s `cargo`
 
 Retrieves a node’s cargo. 
 
@@ -120,7 +128,7 @@ Retrieves a node’s cargo.
 
 Look up the Node, and check that `id` is valid. 
 
-        node = @nodes[id]
+        node = @[_o._]._nodes[id]
         if _o.isU node
           _o.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
           throw RangeError M + "
@@ -133,50 +141,16 @@ Return the cargo.
 
 
 
-#### `xx()`
-- `yy <zz>`      @todo describe
-- `<undefined>`  does not return anything
-
-@todo describe
-
-      xx: (yy) ->
-        M = "/listag/src/Listag.litcoffee
-          Listag::xx()\n  "
-
-
-
-
-Namespaced Functions
---------------------
-
-
-#### `xx()`
-- `yy <zz>`      @todo describe
-- `<undefined>`  does not return anything
-
-@todo describe
-
-    Listag.xx = (yy) ->
-      M = "/listag/src/Listag.litcoffee
-        Listag.xx()\n  "
-
-
-
-
 Private Constants
 -----------------
 
 
-#### `ID_RULE <string>`
-Validates the `id` argument. 
+#### `ID_RULE, TAG_RULE <string>`
+Validates the `id` and `tags` arguments. 
 
-    ID_RULE = '^[a-z]\\w{1,23}$'
-
-
-#### `TAG_RULE <string>`
-Validates tags. 
-
+    ID_RULE  = '^[a-z]\\w{1,23}$'
     TAG_RULE = '^[a-z]\\w{1,23}$'
+
 
 
 

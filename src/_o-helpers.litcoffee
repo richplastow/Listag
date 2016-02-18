@@ -98,16 +98,16 @@ Xx. @todo description
 
 
 
-#### `_o.redefine()`
+#### `_o.define()`
 - `'constant'` Enumerable but immutable
 
 Convert a property to one of XX kinds:
 
-    _o.redefine = (obj, name, value, kind) ->
+    _o.define = (obj, name, value, kind) ->
       switch kind
         when 'constant'
           Object.defineProperty obj, name, { value:value, enumerable:true }
-        when 'private'
+        when 'hid'
           Object.defineProperty obj, name, { value:value, enumerable:false }
 
 

@@ -30,9 +30,9 @@ Prepare a test-instance.
       "Instance properties as expected"
 
 
-      "`Listag::nodes` is an object"
+      "`Listag::_nodes` is a private object"
       _o.O
-      (listag) -> listag.nodes
+      (listag) -> listag[_o._]._nodes
 
       "`Listag::total` is an object"
       _o.O
@@ -49,6 +49,10 @@ Prepare a test-instance.
 
       tudor.equal
 
+      "A listag instance has enumerable properties as expected"
+      '{"total":{},"head":{},"tail":{}}'
+      (listag) -> JSON.stringify listag
+
       "`Listag::C` is 'Listag'"
       'Listag'
       (listag) -> listag.C
@@ -57,9 +61,9 @@ Prepare a test-instance.
       '[object Listag]'
       (listag) -> listag+''
 
-      "`Listag::nodes` is empty"
+      "`Listag::_nodes` is empty"
       0
-      (listag) -> Object.keys( listag.nodes ).length
+      (listag) -> Object.keys( listag[_o._]._nodes ).length
 
       "`Listag::total` is empty"
       0

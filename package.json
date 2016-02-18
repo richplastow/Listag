@@ -1,6 +1,6 @@
 {
   "name": "listag",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A doubly linked list with tags",
   "main": "build/listag.js",
   "directories": {
@@ -17,7 +17,10 @@
   },
   "keywords": [
     "CoffeeScript",
+    "Literate CoffeeScript",
+    "Linked List",
     "Doubly Linked List",
+    "Multiply Linked List",
     "List",
     "Data Structure",
     "Tagged"

@@ -303,7 +303,7 @@ Prepare a test-instance.
       10
       (listag) ->
         i = 0
-        node = listag.nodes.aB
+        node = listag[_o._]._nodes.aB
         while node
           i++
           node = node.next.node
@@ -367,7 +367,7 @@ Prepare a test-instance.
       1
       (listag) ->
         i = 0
-        node = listag.nodes.rightmost_dog
+        node = listag[_o._]._nodes.rightmost_dog
         _o 
         while node
           i++
