@@ -1,6 +1,6 @@
 {
   "name": "listag",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "A doubly linked list with tags",
   "main": "build/listag.js",
   "directories": {

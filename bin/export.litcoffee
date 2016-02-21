@@ -3,6 +3,10 @@ Export Module
 
 #### The module’s only entry-point is the `Listag` class
 
+Prevent properties being accidentally modified or added to the module. 
+
+    _o.lock Listag
+
 First, try defining an AMD module, eg for [RequireJS](http://requirejs.org/). 
 
     if _o.F == typeof define and define.amd

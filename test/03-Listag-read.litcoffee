@@ -9,7 +9,7 @@
 
 
 
-      "`read()` is a function which returns an object"
+      "`read()` is a function which may return any kind of value"
 
 Prepare a test-instance. 
 

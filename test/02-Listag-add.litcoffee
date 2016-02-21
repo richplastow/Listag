@@ -55,12 +55,12 @@ Prepare a test-instance.
 
 
       "A Listag instance can be recorded in another Listag instance"
-      100
+      'obj_in_subListag'
       (listag) ->
-        secondListag = new Listag
-        secondListag.x = 100
-        listag.add(secondListag)
-        listag.tail.node.cargo.x
+        subListag = new Listag
+        subListag.add {x:'obj_in_subListag'}
+        listag.add(subListag)
+        listag.tail.node.cargo.tail.node.cargo.x
 
 
 @todo more allowed node objects, and also other types
@@ -278,6 +278,10 @@ Prepare a test-instance.
       "16 nodes created during the '02 Listag::add()' test"
       16
       (listag) -> listag.total.node
+
+      "5 tags created during the '02 Listag::add()' test"
+      5
+      (listag) -> Object.keys(listag.total).length
 
       "Traversing rightward from `head` takes 16 steps"
       16

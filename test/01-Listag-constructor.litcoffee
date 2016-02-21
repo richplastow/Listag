@@ -20,9 +20,17 @@ Prepare a test-instance.
       _o.F
       -> Listag
 
+      "Cannot add a property to the Listag class"
+      _o.U
+      -> Listag.nope = 123; Listag.nope
+
       "`new` returns an object"
       _o.O
       (listag) -> listag
+
+      "Cannot add a property to the Listag class’s prototype object"
+      _o.U
+      (listag) -> Listag::nope = 456; listag.nope
 
 
 

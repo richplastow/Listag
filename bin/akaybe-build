@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-/*! akaybe-build 0.0.11 //// MIT Licence //// http://akaybe.richplastow.com/ */
+/*! akaybe-build 0.0.14 //// MIT Licence //// http://akaybe.richplastow.com/ */
 
 !function (root) { 'use strict';
 
 
     //// Define constants.
     var T     = 'akaybe-build'
-      , V     = '0.0.11'
+      , V     = '0.0.14'
 
 
     //// Load Node modules.
@@ -218,14 +218,17 @@
       + legal()   // add title, version, license and homepage
       + ' ###\\n' // end the legal-comment
       + iandv()   // inject the title and version into `_oT` and `_oV` vars
-      + ' \\n'    // newline after the `_oT` and `_oV` vars
-      + '" | '    // end the string, and pipe it to `cat`
+      + ' \\n"'   // newline after the `_oT` and `_oV` vars, and end the string
+      + ' | '     // pipe the string to `cat`
 
     //// Concatenate and compile the CoffeeScript, and save the JavaScript file.
       + 'cat - '  // `cat` accepts piped text unix.stackexchange.com/a/16364
-      + 'src/**/*.litcoffee src/*.litcoffee '
-      + ' 2> /dev/null' // suppress `cat` warnings
-      + '| '      // pipe concatenated CoffeeScript into `coffee`
+      + 'oopish/*.litcoffee '   // Oopish helpers
+      + 'src/*.litcoffee '      // the src top level is for base classes
+      + 'src/**/*.litcoffee '   // src subfolders extend top-level classes
+      + 'bin/export.litcoffee ' // for AMD, CommonJS, and `window.TheModule`
+      + '2> /dev/null' // suppress `cat` warnings
+      + ' | '     // pipe concatenated CoffeeScript into `coffee`
       + 'coffee'  // the CoffeeScript compiler
       + ' -b'     // --bare      we'll add our own top-level function wrapper
       + ' -s'     // --stdio     listen for and compile scripts over stdio
@@ -255,12 +258,16 @@
       + legal()   // add title, version, license and homepage
       + ' ###\\n' // end the legal-comment
       + iandv()   // inject the title and version into `_oT` and `_oV` vars
-      + ' \\n'    // newline after the `_oT` and `_oV` vars
-      + '" | '    // end the string, and pipe it to `cat`
+      + ' \\n"'   // newline after the `_oT` and `_oV` vars, and end the string
+      + ' | '     // pipe the string to `cat`
       + 'cat - '  // `cat` accepts piped text unix.stackexchange.com/a/16364
-      + 'src/**/*.litcoffee src/*.litcoffee test/*.litcoffee '
-      + ' 2> /dev/null' // suppress `cat` warnings
-      + '| '      // pipe concatenated CoffeeScript into `coffee`
+      + 'oopish/*.litcoffee '   // Oopish helpers
+      + 'src/*.litcoffee '      // the src top level is for base classes
+      + 'src/**/*.litcoffee '   // src subfolders extend top-level classes
+      + 'test/*.litcoffee '     // only included in the test-build
+      + 'bin/export.litcoffee ' // for AMD, CommonJS, and `window.TheModule`
+      + '2> /dev/null' // suppress `cat` warnings
+      + ' | '     // pipe concatenated CoffeeScript into `coffee`
       + 'coffee'  // the CoffeeScript compiler
       + ' -b'     // --bare      we'll add our own top-level function wrapper
       + ' -s'     // --stdio     listen for and compile scripts over stdio

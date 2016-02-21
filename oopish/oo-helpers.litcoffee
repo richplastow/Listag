@@ -113,6 +113,19 @@ Convert a property to one of XX kinds:
 
 
 
+#### `_o.lock()`
+
+@todo describe
+
+    _o.lock = (obj) ->
+      for key in Object.keys obj
+        Object.defineProperty obj, key, { writable:false, configurable:false }
+      Object.preventExtensions obj
+      if obj.prototype and obj != obj.prototype then _o.lock obj.prototype
+
+
+
+
 #### `_o.vArray()`
 - `M <string>`            a method-name prefix to add to exception messages
 - `arr <array>`           the array which contains the values to validate
