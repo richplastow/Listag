@@ -77,12 +77,17 @@ Determines whether haystack contains a given needle. @todo arrays and objects
       if -1 != h.indexOf n then t else f
 
 
-
-
 #### `_o.uid()`
 Xx optional prefix. @todo description
 
-    _o.uid = (p='id', l=8) ->
+    _o.uid = (p='id') ->
+      p + '_' + ( Math.random().toString(36).substr(2) + '00000000' ).substr 2,8
+
+
+#### `_o.uid62()`
+Xx optional prefix. @todo description
+
+    _o.uid62 = (p='id', l=8) ->
       c = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
       p + '_' + ( c.charAt(Math.floor(Math.random()*62)) while l-- ).join('')
 

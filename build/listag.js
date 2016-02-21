@@ -112,7 +112,14 @@ _o.has = function(h, n, t, f) {
   }
 };
 
-_o.uid = function(p, l) {
+_o.uid = function(p) {
+  if (p == null) {
+    p = 'id';
+  }
+  return p + '_' + (Math.random().toString(36).substr(2) + '00000000').substr(2, 8);
+};
+
+_o.uid62 = function(p, l) {
   var c;
   if (p == null) {
     p = 'id';
