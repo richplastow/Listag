@@ -17,7 +17,7 @@ Prepare a test-instance.
 
 
       "`read()` is a function"
-      _o.F
+      oo.F
       (listag) -> listag.read
 
 

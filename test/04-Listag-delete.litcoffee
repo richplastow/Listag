@@ -17,19 +17,19 @@ Prepare a test-instance.
 
 
       "`delete()` is a function"
-      _o.F
+      oo.F
       (listag) -> listag.delete
 
 
       "`delete()` is not writable"
-      _o.F
+      oo.F
       (listag) ->
         listag.delete = 123
         listag.delete
 
 
       "`delete()` is not configurable"
-      _o.F
+      oo.F
       (listag) ->
         try
           Object.defineProperty listag, 'delete', { writable:true }
@@ -39,7 +39,7 @@ Prepare a test-instance.
 
 
       "`delete('the_first')` returns `undefined`"
-      _o.U
+      oo.U
       (listag) ->
         listag.add (new Date), 'the_first'
         listag.delete 'the_first'

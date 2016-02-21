@@ -17,12 +17,12 @@ Prepare a test-instance.
 
 
       "`add()` is a function"
-      _o.F
+      oo.F
       (listag) -> listag.add
 
 
       "`add({x:'the_first'})` returns a string"
-      _o.S
+      oo.S
       (listag) -> listag.add {x:'the_first'}
 
       tudor.equal
@@ -307,7 +307,7 @@ Prepare a test-instance.
       10
       (listag) ->
         i = 0
-        node = listag[_o._]._nodes.aB
+        node = listag[oo._]._nodes.aB
         while node
           i++
           node = node.next.node
@@ -371,8 +371,8 @@ Prepare a test-instance.
       1
       (listag) ->
         i = 0
-        node = listag[_o._]._nodes.rightmost_dog
-        _o 
+        node = listag[oo._]._nodes.rightmost_dog
+        oo 
         while node
           i++
           node = node.next.dog

@@ -6,109 +6,109 @@ Oopish Helpers
 Oopish’s helper functions are visible to all code defined in ‘src/’ and ‘test/’ 
 but are hidden from code defined elsewhere in the runtime environment. 
 
-- Helpers are ‘pure’ (they return the same output for a given set of arguments)
-- They have no side-effects, other than throwing exceptions
+- Helpers have no side-effects, other than throwing exceptions
 - They run identically in all modern environments (browser, server, desktop, …)
-- The Oopish helpers minify to xxx bytes @todo how big? and zipped?
+- They are short - each minifies to xxx bytes, at most @todo how big? zipped?
+- They return the same output for a given set of arguments (except `oo.uid()`)
 
 
 
 
-#### `_o.is()`
+#### `oo.is()`
 Useful for reducing CoffeeScript’s verbose conditional syntax, eg:  
-`if condition then 123 else 456` becomes `_o.is condition, 123, 456`. 
+`if condition then 123 else 456` becomes `oo.is condition, 123, 456`. 
 
-    _o.is = (c, t=true, f=false) ->
+    oo.is = (c, t=true, f=false) ->
       if c then t else f
 
 
 
 
-#### `_o.isU()`
+#### `oo.isU()`
 @todo description
 
-    _o.isU = (x) ->
-      _o.U == typeof x
+    oo.isU = (x) ->
+      oo.U == typeof x
 
 
 
 
-#### `_o.isX()`
+#### `oo.isX()`
 @todo description
 
-    _o.isX = (x) ->
+    oo.isX = (x) ->
       null == x
 
 
 
 
-#### `_o.type()`
+#### `oo.type()`
 To detect the difference between 'null', 'array', 'regexp' and 'object' types, 
 we use [Angus Croll’s one-liner](http://goo.gl/WlpBEx). This can be used in 
 place of JavaScript’s familiar `typeof` operator, with one important exception: 
 when the variable being tested does not exist, `typeof foobar` will return 
-`undefined`, whereas `_o.type(foobar)` will throw an error. 
+`undefined`, whereas `oo.type(foobar)` will throw an error. 
 
-    _o.type = (a) ->
-      return _o.X if _o.isX a # prevent `domwindow` in some UAs
+    oo.type = (a) ->
+      return oo.X if oo.isX a # prevent `domwindow` in some UAs
       ta = typeof a
       return ta if { undefined:1, string:1, number:1, boolean:1 }[ta]
       if ! a.nodeName and a.constructor != Array and /function/i.test(''+a)
-        return _o.F # IE<=8 http://goo.gl/bTbbov
+        return oo.F # IE<=8 http://goo.gl/bTbbov
       ({}).toString.call(a).match(/\s([a-z0-9]+)/i)[1].toLowerCase()
 
 
 
 
-#### `_o.ex()`
+#### `oo.ex()`
 Exchanges a character from one set for its equivalent in another. To decompose 
-an accent, use `_o.ex(c, 'àáäâèéëêìíïîòóöôùúüûñç', 'aaaaeeeeiiiioooouuuunc')`
+an accent, use `oo.ex(c, 'àáäâèéëêìíïîòóöôùúüûñç', 'aaaaeeeeiiiioooouuuunc')`
 
-    _o.ex = (x, a, b) ->
+    oo.ex = (x, a, b) ->
       if -1 == pos = a.indexOf x then x else b.charAt pos
 
 
 
 
-#### `_o.has()`
+#### `oo.has()`
 Determines whether haystack contains a given needle. @todo arrays and objects
 
-    _o.has = (h, n, t=true, f=false) ->
+    oo.has = (h, n, t=true, f=false) ->
       if -1 != h.indexOf n then t else f
 
 
-#### `_o.uid()`
+#### `oo.uid()`
 Xx optional prefix. @todo description
 
-    _o.uid = (p='id') ->
-      p + '_' + ( Math.random().toString(36).substr(2) + '00000000' ).substr 2,8
+    oo.uid = (p='id') ->
+      p + '_' + ( Math.random().toString(36) + '00000000' ).substr 2,8
 
 
-#### `_o.uid62()`
+#### `oo.uid62()`
 Xx optional prefix. @todo description
 
-    _o.uid62 = (p='id', l=8) ->
+    oo.uid62 = (p='id', l=8) ->
       c = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
       p + '_' + ( c.charAt(Math.floor(Math.random()*62)) while l-- ).join('')
 
 
 
 
-#### `_o.insert()`
+#### `oo.insert()`
 Xx. @todo description
 
-    _o.insert = (basis, overlay, offset) ->
+    oo.insert = (basis, overlay, offset) ->
       basis.slice(0, offset) + overlay + basis.slice(offset+overlay.length)
 
 
 
 
-#### `_o.define()`
+#### `oo.define()`
 - `'constant'` Enumerable but immutable
 
 Convert a property to one of XX kinds:
 
-    _o.define = (obj, name, value, kind) ->
+    oo.define = (obj, name, value, kind) ->
       switch kind
         when 'constant'
           Object.defineProperty obj, name, { value:value, enumerable:true }
@@ -118,20 +118,20 @@ Convert a property to one of XX kinds:
 
 
 
-#### `_o.lock()`
+#### `oo.lock()`
 
 @todo describe
 
-    _o.lock = (obj) ->
+    oo.lock = (obj) ->
       for key in Object.keys obj
         Object.defineProperty obj, key, { writable:false, configurable:false }
       Object.preventExtensions obj
-      if obj.prototype and obj != obj.prototype then _o.lock obj.prototype
+      if obj.prototype and obj != obj.prototype then oo.lock obj.prototype
 
 
 
 
-#### `_o.vArray()`
+#### `oo.vArray()`
 - `M <string>`            a method-name prefix to add to exception messages
 - `arr <array>`           the array which contains the values to validate
 - `signature <string>`    type and rules for elements
@@ -140,13 +140,13 @@ Convert a property to one of XX kinds:
 
 Validates an array. 
 
-    _o.vArray = (M, arr, signature, fallback) ->
+    oo.vArray = (M, arr, signature, fallback) ->
 
 Get `types` and `rule` from the signature. 
 
         matches = signature.match /^<array of ([|a-z]+)\s*(.*)>$/i
-        if ! matches then throw RangeError "/listag/src/_o-helpers.litcoffee
-          _o.vArray()\n  signature #{signature} is invalid"
+        if ! matches then throw RangeError "/listag/oopish/oo-helpers.litcoffee
+          oo.vArray()\n  signature #{signature} is invalid"
         [signature, types, rule] = matches
 
 Use the fallback, if needed. 
@@ -155,18 +155,18 @@ Use the fallback, if needed.
 
 Step through each element in `arr`, and get its value’s type. 
 
-        if _o.A != _o.type arr then throw RangeError M +
-          " is type #{_o.type arr} not array"
+        if oo.A != oo.type arr then throw RangeError M +
+          " is type #{oo.type arr} not array"
 
         for value,i in arr
-          tv = _o.type value
+          tv = oo.type value
 
 Check the type and rule. 
 
           pass = false
           for type in types.split '|'
-            if (_o.N == type or _o.I == type) and _o.N == tv
-              if _o.I == type and value % 1
+            if (oo.N == type or oo.I == type) and oo.N == tv
+              if oo.I == type and value % 1
                 throw RangeError M + "[#{i}] is a number but not an integer"
               if rule
                 [min, max] = rule.split '-'
@@ -175,13 +175,13 @@ Check the type and rule.
               pass = true
               break
             if type == tv
-              if _o.S == tv and rule
+              if oo.S == tv and rule
                 unless RegExp(rule).test value
                   throw RangeError M + "[#{i}] fails #{rule}"
               pass = true
               break
             if /^[A-Z]/.test type
-              if _o.O == tv
+              if oo.O == tv
                 if eval "value instanceof #{type}" #@todo refactor to avoid `eval()`
                   pass = true
                   break
@@ -192,7 +192,7 @@ Check the type and rule.
 
 
 
-#### `_o.validator()`
+#### `oo.validator()`
 - `M <string>`            a method-name prefix to add to exception messages
 - `obj <object>`          the object which contains the values to validate
 - `<function>`            the validator, which determines a property’s validity
@@ -202,30 +202,30 @@ Check the type and rule.
 
 Creates a custom validator. 
 
-    _o.validator = (M, obj) ->
+    oo.validator = (M, obj) ->
 
       (signature, fallback) ->
 
 Get `key`, `types` and `rule` from the signature. 
 
         matches = signature.match /^([_a-z][_a-z0-9]*)\s+<([|a-z]+)\s*(.*)>$/i
-        if ! matches then throw RangeError "/listag/src/_o-helpers.litcoffee
-          _o.validator()\n  signature #{signature} is invalid"
+        if ! matches then throw RangeError "/listag/oopish/oo-helpers.litcoffee
+          oo.validator()\n  signature #{signature} is invalid"
         [signature, key, types, rule] = matches
 
 Use the fallback, if needed. 
 
         value = obj[key]
-        tv = _o.type value
-        if _o.U == tv
+        tv = oo.type value
+        if oo.U == tv
           if 2 == arguments.length then return fallback
           throw TypeError M + key + " is undefined and has no fallback"
 
 Check the type and rule. 
 
         for type in types.split '|'
-          if (_o.N == type or _o.I == type) and _o.N == tv
-            if _o.I == type and value % 1
+          if (oo.N == type or oo.I == type) and oo.N == tv
+            if oo.I == type and value % 1
               throw RangeError M + key + " is a number but not an integer"
             if rule
               [min, max] = rule.split '-'
@@ -233,12 +233,12 @@ Check the type and rule.
                 throw RangeError M + key + " is #{value} (must be #{rule})"
             return value
           if type == tv
-            if _o.S == tv and rule
+            if oo.S == tv and rule
               unless RegExp(rule).test value
                 throw RangeError M + key + " fails #{rule}"
             return value
           if /^[A-Z]/.test type
-            if _o.O == tv
+            if oo.O == tv
               if eval "value instanceof #{type}" #@todo refactor to avoid `eval()`
                 return value
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-/*! akaybe-build 0.0.14 //// MIT Licence //// http://akaybe.richplastow.com/ */
+/*! oopish-build 0.0.14 //// MIT Licence //// http://oopish.richplastow.com/ */
 
 !function (root) { 'use strict';
 
 
     //// Define constants.
-    var T     = 'akaybe-build'
+    var T     = 'oopish-build'
       , V     = '0.0.14'
 
 
@@ -152,13 +152,34 @@
         }
 
 
-    //// `iandv()` returns a CoffeeScript line defining `_oT` and `_oV`.
-      , iandv = function (indent) {
-            indent  = undefined === indent  ? '    ' : indent; // for litcoffee
-            return indent + "_oT = '" + pkg.title    + "'; " +
-                            "_oV = '" + pkg.version  + "'; " +
-                            "_o  = {};"
-            ;
+    //// `ooTop()` returns a CoffeeScript line defining `ooT` and `ooV`.
+      , ooTop = function () {
+            var out = [
+                "Define the Oopish container"
+              , "---------------------------"
+              , ""
+              , "Rather than just a generic object, the Oopish container can also be used as a "
+              , "handy shortcut for `console.log()` Note [`bind()`](http://goo.gl/66ffgl), and"
+              , "[unusual IE8/9 behaviour](http://goo.gl/ZmG9Xs). "
+              , ""
+              , "    if 'undefined' == typeof console or ! console.log"
+              , "      oo = -> # no-op"
+              , "    else if 'object' == typeof console.log # eg IE8/9"
+              , "      oo = Function::bind console.log, console"
+              , "    else"
+              , "      oo = console.log.bind console"
+              , ""
+              , ""
+              , "Build Constants"
+              , "---------------"
+              , ""
+              , "Generated during the build-process and injected into app-scope. "
+              , ""
+              , "    oo.G = global # global scope, passed into the closure as an argument"
+              , "    oo.T = '" + pkg.title    + "' # project title, converted from package.json's name"
+              , "    oo.V = '" + pkg.version  + "' # project version, from package.json"
+            ];
+            return out.join('\\n').replace(/`/g,'') + '\\n\\n';
         }
 
     ;
@@ -211,22 +232,22 @@
     //// Prepare the command which `nodemon` will run. 
     builder =
 
-    //// Create CoffeeScript for the legal-comment and the `_oT` and `_oV` vars.
+    //// Create CoffeeScript for the legal-comment and initial Oopish setup.
         'echo "'  // begin a string which will be piped to `cat`
       + '    ###' // `coffee` will convert this to '/*'
       + '! '      // minifiers should preserve a comment starting '/*!'
       + legal()   // add title, version, license and homepage
       + ' ###\\n' // end the legal-comment
-      + iandv()   // inject the title and version into `_oT` and `_oV` vars
-      + ' \\n"'   // newline after the `_oT` and `_oV` vars, and end the string
+      + ooTop()   // inject the title and version into `oo.T` and `oo.V`
+      + '"'       // end the string
       + ' | '     // pipe the string to `cat`
 
     //// Concatenate and compile the CoffeeScript, and save the JavaScript file.
       + 'cat - '  // `cat` accepts piped text unix.stackexchange.com/a/16364
-      + 'oopish/*.litcoffee '   // Oopish helpers
-      + 'src/*.litcoffee '      // the src top level is for base classes
-      + 'src/**/*.litcoffee '   // src subfolders extend top-level classes
-      + 'bin/export.litcoffee ' // for AMD, CommonJS, and `window.TheModule`
+      + 'oopish/oo-*.litcoffee '          // Oopish helpers
+      + 'src/*.litcoffee '                // src top-level is for base classes
+      + 'src/**/*.litcoffee '             // src subfolders are for sub-classes
+      + 'oopish/oopish-export.litcoffee ' // for AMD, CommonJS, and `window`
       + '2> /dev/null' // suppress `cat` warnings
       + ' | '     // pipe concatenated CoffeeScript into `coffee`
       + 'coffee'  // the CoffeeScript compiler
@@ -238,7 +259,7 @@
 
     //// Add a top-level function wrapper, to reference global scope. 
       + ' | '     // pipe compiled JavaScript into a sed prepend
-      + 'sed \'2i\\\n(function(_oG) {\'' // argument `_oG` receives global scope
+      + 'sed \'2i\\\n(function(global) {\'' // argument `global` receives global scope
       + ' | '     // pipe compiled JavaScript into a sed append
       + 'sed \'$a\\\n}).call(this,this);\n\'' // 2nd `this` passes global scope
 
@@ -257,15 +278,15 @@
       + '! '      // minifiers should preserve a comment starting '/*!'
       + legal()   // add title, version, license and homepage
       + ' ###\\n' // end the legal-comment
-      + iandv()   // inject the title and version into `_oT` and `_oV` vars
-      + ' \\n"'   // newline after the `_oT` and `_oV` vars, and end the string
+      + ooTop()   // inject the title and version into `oo.T` and `oo.V`
+      + '"'       // end the string
       + ' | '     // pipe the string to `cat`
       + 'cat - '  // `cat` accepts piped text unix.stackexchange.com/a/16364
-      + 'oopish/*.litcoffee '   // Oopish helpers
-      + 'src/*.litcoffee '      // the src top level is for base classes
-      + 'src/**/*.litcoffee '   // src subfolders extend top-level classes
-      + 'test/*.litcoffee '     // only included in the test-build
-      + 'bin/export.litcoffee ' // for AMD, CommonJS, and `window.TheModule`
+      + 'oopish/oo-*.litcoffee '          // Oopish helpers
+      + 'src/*.litcoffee '                // src top-level is for base classes
+      + 'src/**/*.litcoffee '             // src subfolders are for sub-classes
+      + 'test/*.litcoffee '               // only included in the test-build
+      + 'oopish/oopish-export.litcoffee ' // for AMD, CommonJS, and `window`
       + '2> /dev/null' // suppress `cat` warnings
       + ' | '     // pipe concatenated CoffeeScript into `coffee`
       + 'coffee'  // the CoffeeScript compiler
@@ -276,7 +297,7 @@
 
     //// Add a top-level function wrapper, to reference global scope. 
       + ' | '     // pipe compiled JavaScript into a sed prepend
-      + 'sed \'2i\\\n(function(_oG) {\'' // argument `_oG` receives global scope
+      + 'sed \'2i\\\n(function(global) {\'' // argument `global` receives global scope
       + ' | '     // pipe compiled JavaScript into a sed append
       + 'sed \'$a\\\n}).call(this,this);\n\'' // 2nd `this` passes global scope
 
@@ -320,7 +341,7 @@
 
         //// Add a top-level function wrapper, to reference global scope. 
           + ' | '     // pipe compiled JavaScript into a sed prepend
-          + 'sed \'2i\\\n(function(_oG) {\'' // `_oG` receives global scope
+          + 'sed \'2i\\\n(function(global) {\'' // `global` receives global scope
           + ' | '     // pipe compiled JavaScript into a sed append
           + 'sed \'$a\\\n}).call(this,this);\n\'' // 2nd `this` is global scope
           + ' > '     // write to file, replace pre-existing, create if missing

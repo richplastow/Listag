@@ -5,23 +5,23 @@ Export Module
 
 Prevent properties being accidentally modified or added to the module. 
 
-    _o.lock Listag
+    oo.lock Listag
 
 First, try defining an AMD module, eg for [RequireJS](http://requirejs.org/). 
 
-    if _o.F == typeof define and define.amd
+    if oo.F == typeof define and define.amd
       define -> Listag
 
 Next, try exporting for CommonJS, eg for [Node.js](http://goo.gl/Lf84YI):  
 `var Listag = require('listag');`
 
-    else if _o.O == typeof module and module and module.exports
+    else if oo.O == typeof module and module and module.exports
       module.exports = Listag
 
 Otherwise, add the `Listag` class to global scope.  
 Browser usage: `var listag = new window.Listag();`
 
-    else _o.G.Listag = Listag
+    else oo.G.Listag = Listag
 
 
     ;

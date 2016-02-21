@@ -17,19 +17,19 @@ Prepare a test-instance.
 
 
       "The Listag class is a function"
-      _o.F
+      oo.F
       -> Listag
 
       "Cannot add a property to the Listag class"
-      _o.U
+      oo.U
       -> Listag.nope = 123; Listag.nope
 
       "`new` returns an object"
-      _o.O
+      oo.O
       (listag) -> listag
 
       "Cannot add a property to the Listag class’s prototype object"
-      _o.U
+      oo.U
       (listag) -> Listag::nope = 456; listag.nope
 
 
@@ -39,19 +39,19 @@ Prepare a test-instance.
 
 
       "`Listag::_nodes` is a private object"
-      _o.O
-      (listag) -> listag[_o._]._nodes
+      oo.O
+      (listag) -> listag[oo._]._nodes
 
       "`Listag::total` is an object"
-      _o.O
+      oo.O
       (listag) -> listag.total
 
       "`Listag::head` is an object"
-      _o.O
+      oo.O
       (listag) -> listag.head
 
       "`Listag::tail` is an object"
-      _o.O
+      oo.O
       (listag) -> listag.tail
 
 
@@ -71,7 +71,7 @@ Prepare a test-instance.
 
       "`Listag::_nodes` is empty"
       0
-      (listag) -> Object.keys( listag[_o._]._nodes ).length
+      (listag) -> Object.keys( listag[oo._]._nodes ).length
 
       "`Listag::total` is empty"
       0

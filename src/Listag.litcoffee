@@ -14,7 +14,7 @@ Listag
         M = "/listag/src/Listag.litcoffee
           Listag()\n  "
 
-        _o.define @, _o._, {}, 'hid'
+        oo.define @, oo._, {}, 'hid'
 
 
 
@@ -45,13 +45,13 @@ Private Properties
 #### `_nodes <object>`
 Contains all Node instances currently held by this Listag instance. 
 
-        @[_o._]._nodes = {}
+        @[oo._]._nodes = {}
 
 
 
 Prevent properties being accidentally modified or added to the instance. 
 
-        if 'Listag' == @C then _o.lock this
+        if 'Listag' == @C then oo.lock this
 
 
 
@@ -66,7 +66,7 @@ Methods
 - `tags <array of string>`  (optional) must not be the special string 'node'
 - `<string>`                returns the newly-added object’s identifier
 
-Creates a new Node instance in `nodes`. 
+Creates a new Node instance in `_nodes`. 
 
       add: (cargo, id, tags=[]) ->
         M = "/listag/src/Listag.litcoffee
@@ -74,20 +74,20 @@ Creates a new Node instance in `nodes`.
 
 Check that the arguments are ok, and that `id` is unique. 
 
-        id = id || _o.uid()
-        _o.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
+        id = id || oo.uid()
+        oo.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
 
-        unless _o.isU @[_o._]._nodes[id] then throw RangeError M + "
+        unless oo.isU @[oo._]._nodes[id] then throw RangeError M + "
           a node with id '#{id}' already exists"
 
-        _o.vArray M + "argument tags", tags,
+        oo.vArray M + "argument tags", tags,
           "<array of string #{TAG_RULE}>", []
 
         tmp = {}
         for tag,i in tags
           if 'node' == tag then throw RangeError M + "
             argument tags[#{i}] is the special tag 'node'"
-          unless _o.isU tmp[tag] then throw RangeError M + "
+          unless oo.isU tmp[tag] then throw RangeError M + "
             argument tags[#{i}] is a duplicate of tags[#{tmp[tag]}]"
           tmp[tag] = i
 
@@ -99,7 +99,7 @@ Create a new Node instance, and fill the `previous` and `next` properties.
           node.previous[tag] = if @total[tag] then @tail[tag] else null
           node.next[tag] = null
 
-Append the new Node instance to `nodes`. 
+Append the new Node instance to `_nodes`. 
 
           if @total[tag]
             @tail[tag].next[tag] = node
@@ -111,7 +111,7 @@ Append the new Node instance to `nodes`.
 
 Allow the node to be accessed by `id`, and return the `id`. 
 
-        @[_o._]._nodes[id] = node
+        @[oo._]._nodes[id] = node
         return id
 
 
@@ -129,9 +129,9 @@ Retrieves a node’s cargo.
 
 Look up the Node, and check that `id` is valid. 
 
-        node = @[_o._]._nodes[id]
-        if _o.isU node
-          _o.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
+        node = @[oo._]._nodes[id]
+        if oo.isU node
+          oo.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
           throw RangeError M + "
             the node with id '#{id}' does not exist"
 
@@ -154,9 +154,9 @@ Removes a node from this Listag.
 
 Look up the Node, and check that `id` is valid. 
 
-        node = @[_o._]._nodes[id]
-        if _o.isU node
-          _o.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
+        node = @[oo._]._nodes[id]
+        if oo.isU node
+          oo.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
           throw RangeError M + "
             the node with id '#{id}' does not exist"
 
@@ -182,9 +182,9 @@ Update the `total`, `head` and `tail` properties.
             delete @tail[tag]
 
 
-Delete the Item from `nodes`. 
+Delete the Item from `_nodes`. 
 
-          delete @[_o._]._nodes[id]
+          delete @[oo._]._nodes[id]
 
 Do not return anything. 
 
