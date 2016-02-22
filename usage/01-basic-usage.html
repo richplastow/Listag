@@ -25,9 +25,12 @@ addEventListener('load', function () {
 
         //// Reveals the current state of `listag`. 
       , stringify = function () {
+            // $log.innerHTML =
+            //     'JSON.stringify(listag):\n\n'
+            //    + JSON.stringify(listag, serializer(), '  ');
             $log.innerHTML =
-                'JSON.stringify(listag):\n\n'
-               + JSON.stringify(listag, serializer(), '  ');
+                'listag.browse():\n\n'
+               + listag.browse();
         }
 
         //// https://github.com/isaacs/json-stringify-safe/blob/master/stringify.js

@@ -22,6 +22,7 @@ make the source code less verbose: `oo.O == typeof x` vs `'object' == typeof x`.
     oo.E = 'error'
     oo.F = 'function'
     #       oo.G is the `global` context, see `oopish-build:ooTop()`
+    oo.I = 'integer'
     #       oo.M is not used, to avoid confusion with a method’s `M` variable
     oo.N = 'number'
     oo.O = 'object'

@@ -22,8 +22,6 @@ Useful for reducing CoffeeScript’s verbose conditional syntax, eg:
       if c then t else f
 
 
-
-
 #### `oo.isU()`
 @todo description
 
@@ -31,15 +29,11 @@ Useful for reducing CoffeeScript’s verbose conditional syntax, eg:
       oo.U == typeof x
 
 
-
-
 #### `oo.isX()`
 @todo description
 
     oo.isX = (x) ->
       null == x
-
-
 
 
 #### `oo.type()`
@@ -58,16 +52,12 @@ when the variable being tested does not exist, `typeof foobar` will return
       ({}).toString.call(a).match(/\s([a-z0-9]+)/i)[1].toLowerCase()
 
 
-
-
 #### `oo.ex()`
 Exchanges a character from one set for its equivalent in another. To decompose 
 an accent, use `oo.ex(c, 'àáäâèéëêìíïîòóöôùúüûñç', 'aaaaeeeeiiiioooouuuunc')`
 
     oo.ex = (x, a, b) ->
       if -1 == pos = a.indexOf x then x else b.charAt pos
-
-
 
 
 #### `oo.has()`
@@ -90,6 +80,15 @@ Xx optional prefix. @todo description
     oo.uid62 = (p='id', l=8) ->
       c = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
       p + '_' + ( c.charAt(Math.floor(Math.random()*62)) while l-- ).join('')
+
+
+
+
+#### `oo.pad()`
+Xx. @todo description
+
+    oo.pad = (s, l, c=' ') ->
+      s + Array(l-s.length+1).join(c)
 
 
 
@@ -192,7 +191,62 @@ Check the type and rule.
 
 
 
-#### `oo.validator()`
+#### `oo.vArg()`
+- `M <string>`          a method-name prefix to add to exception messages
+- `value <any>`         the value to validate
+- `signature <string>`  the value’s name and type
+- `fallback <mixed>`    (optional) a value to use if `arg` is undefined
+- `<mixed>`             returns the valid value
+
+Creates a custom validator. 
+
+    oo.vArg = (M, value, signature, fallback) ->
+
+Get `key`, `types` and `rule` from the signature. 
+
+        matches = signature.match /^([_a-z][_a-z0-9]*)\s+<([|a-z]+)\s*(.*)>$/i
+        if ! matches then throw RangeError "/listag/oopish/oo-helpers.litcoffee
+          oo.vArg()\n  signature #{signature} is invalid"
+        [signature, key, types, rule] = matches
+
+Prepare a prefix for errors. 
+
+        pfx = M + "argument #{key} "
+
+Use the fallback, if needed. 
+
+        tv = oo.type value
+        if oo.U == tv
+          if 4 == arguments.length then return fallback
+          throw TypeError pfx + "is undefined and has no fallback"
+
+Check the type and rule. 
+
+        for type in types.split '|'
+          if (oo.N == type or oo.I == type) and oo.N == tv
+            if oo.I == type and value % 1
+              throw RangeError pfx + "is a number but not an integer"
+            if rule
+              [min, max] = rule.split '-'
+              if value < min or value > max
+                throw RangeError pfx + "is #{value} (must be #{rule})"
+            return value
+          if type == tv
+            if oo.S == tv and rule
+              unless RegExp(rule).test value
+                throw RangeError pfx + "fails #{rule}"
+            return value
+          if /^[A-Z]/.test type
+            if oo.O == tv
+              if eval "value instanceof #{type}" #@todo refactor to avoid `eval()`
+                return value
+
+        throw TypeError pfx + "is type #{tv} not #{types}"
+
+
+
+
+#### `oo.vObject()`
 - `M <string>`            a method-name prefix to add to exception messages
 - `obj <object>`          the object which contains the values to validate
 - `<function>`            the validator, which determines a property’s validity
@@ -202,7 +256,10 @@ Check the type and rule.
 
 Creates a custom validator. 
 
-    oo.validator = (M, obj) ->
+    oo.vObject = (M, objName, obj) ->
+
+      if oo.O != oo.type obj
+        throw TypeError M + objName + " is type #{oo.type obj} not object"
 
       (signature, fallback) ->
 
@@ -210,7 +267,7 @@ Get `key`, `types` and `rule` from the signature.
 
         matches = signature.match /^([_a-z][_a-z0-9]*)\s+<([|a-z]+)\s*(.*)>$/i
         if ! matches then throw RangeError "/listag/oopish/oo-helpers.litcoffee
-          oo.validator()\n  signature #{signature} is invalid"
+          oo.vObject()\n  signature #{signature} is invalid"
         [signature, key, types, rule] = matches
 
 Use the fallback, if needed. 
@@ -219,30 +276,30 @@ Use the fallback, if needed.
         tv = oo.type value
         if oo.U == tv
           if 2 == arguments.length then return fallback
-          throw TypeError M + key + " is undefined and has no fallback"
+          throw TypeError M + objName + '.' + key + " is undefined and has no fallback"
 
 Check the type and rule. 
 
         for type in types.split '|'
           if (oo.N == type or oo.I == type) and oo.N == tv
             if oo.I == type and value % 1
-              throw RangeError M + key + " is a number but not an integer"
+              throw RangeError M + objName + '.' + key + " is a number but not an integer"
             if rule
               [min, max] = rule.split '-'
               if value < min or value > max
-                throw RangeError M + key + " is #{value} (must be #{rule})"
+                throw RangeError M + objName + '.' + key + " is #{value} (must be #{rule})"
             return value
           if type == tv
             if oo.S == tv and rule
               unless RegExp(rule).test value
-                throw RangeError M + key + " fails #{rule}"
+                throw RangeError M + objName + '.' + key + " fails #{rule}"
             return value
           if /^[A-Z]/.test type
             if oo.O == tv
               if eval "value instanceof #{type}" #@todo refactor to avoid `eval()`
                 return value
 
-        throw TypeError M + key + " is type #{tv} not #{types}"
+        throw TypeError M + objName + '.' + key + " is type #{tv} not #{types}"
 
 
 

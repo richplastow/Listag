@@ -4,6 +4,40 @@ Listag
 @todo describe
 
 
+```
+         cat  red  dog
+tibbles  x    x
+fluffy   x
+fido          x    x
+
+
+.------------------------------------------------------------------------------.
+|                |  .------.  .---------.  .---------.  .---------.  .------.  |
+|     Listag     |  | null |  | tibbles |  | fluffy  |  |  fido   |  | null |  |
+|                |  |      |  | cat,red |  |   cat   |  | dog,red |  |      |  |
+|----------------|  |      |  |         |  |         |  |         |  |      |  |
+|                |  |      |  |         |  |         |  |         |  |      |  |
+|                |  |     <----- node  <----- node  <----- node   |  |      |  |
+| node.previous. |  |     <----- cat   <----- cat    |  |         |  |      |  |
+|                |  |     <----- red   <---|         |---- red    |  |      |  |
+|                |  |     <---|         |--|         |---- dog    |  |      |  |
+|----------------|  |      |  |         |  |         |  |         |  |      |  |
+|                |  |      |  |   node ----->  node ----->  node ----->     |  |
+|                |  |      |  |    cat ----->   cat ----|         |--->     |  |
+|   node.next.   |  |      |  |    red ----|         |--->   red ----->     |  |
+|                |  |      |  |         |  |         |  |    dog ----->     |  |
+|                |  |      |  |         |  |         |  |         |  |      |  |
+|                |  '======'  '==|======'  '====|===='  '======|=='  '======'  |
+|----------------|---------------|--------------|--------------|---------------|
+| total.node = 3 |   head.node --|              |              |-- tail.node   |
+| total.cat  = 2 |   head.cat  --|              '-- tail.cat   |               |
+| total.red  = 2 |   head.red  --'                             |-- tail.red    |
+| total.dog  = 1 |                                  head.dog --'-- tail.dog    |
+'=============================================================================='
+```
+
+
+
 #### The main class for Listag
 
     class Listag
@@ -56,8 +90,90 @@ Prevent properties being accidentally modified or added to the instance.
 
 
 
-Methods
--------
+B.R.E.A.D. Methods
+------------------
+
+
+#### `browse()`
+- `config <object> {}`  defines what to show, and how to show it
+  - `config.format <string> 'text'`  how to format the output @todo more
+  - `config.tags <array of string> ['node']`  only browse certain tags
+- `<array|string>`  the return type depends on `config.format`
+
+Filters and formats `_nodes` in various ways. 
+
+      browse: (config={}) ->
+        M = "/listag/src/Listag.litcoffee
+          Listag::browse()\n  "
+
+        v = oo.vObject M, 'config', config
+        v 'format <string ^text|array$>', 'text'
+
+Deal with an empty Listag. 
+
+        if ! @total.node
+          return if 'array' == config.format then [] else '[empty]'
+
+Summarize the node metadata in an array, and find the longest id and type. 
+
+        maxId   = 0
+        maxType = 0
+        meta    = []
+        node = @head.node
+        while node
+          tags = {}
+          tags[tag] = 'x' for tag of node.next
+          type = oo.type node.cargo
+          meta.push { id:node.id, tags:tags, type:type }
+          maxId   = if node.id.length > maxId   then node.id.length else maxId
+          maxType = if type.length    > maxType then type.length    else maxType
+          node = node.next.node
+
+Deal with a request for metadata in 'array' format. 
+
+        if 'array' == config.format then return meta
+
+Otherwise, render the metadata as a text-based table, suitable for CLI output. 
+
+        row = oo.pad '', maxId + maxType + 2, '.'
+        (if 'node' != t then row += '..' + t) for t in Object.keys @total
+
+        out = [row]
+        for node in meta
+          row = oo.pad(node.id, maxId) + '  ' + oo.pad(node.type, maxType)
+          for t in Object.keys @total
+            if 'node' != t
+              row += '  ' + oo.pad(node.tags[t] || ' ', t.length)
+          out.push row
+
+        return out.join '\n'
+
+
+
+
+#### `read()`
+- `id <string>`  an identifier, unique within this Listag
+- `<any>`        returns the node’s `cargo`
+
+Retrieves a node’s cargo. 
+
+      read: (id) ->
+        M = "/listag/src/Listag.litcoffee
+          Listag::read()\n  "
+
+Look up the Node, and check that `id` is valid. 
+
+        node = @[oo._]._nodes[id]
+        if oo.isU node
+          oo.vArg M, id, "id <string #{ID_RULE}>"
+          throw RangeError M + "
+            the node with id '#{id}' does not exist"
+
+Return the cargo. 
+
+        return node.cargo
+
+
 
 
 #### `add()`
@@ -75,13 +191,12 @@ Creates a new Node instance in `_nodes`.
 Check that the arguments are ok, and that `id` is unique. 
 
         id = id || oo.uid()
-        oo.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
+        oo.vArg M, id, "id <string #{ID_RULE}>"
 
-        unless oo.isU @[oo._]._nodes[id] then throw RangeError M + "
+        if @[oo._]._nodes[id] then throw RangeError M + "
           a node with id '#{id}' already exists"
 
-        oo.vArray M + "argument tags", tags,
-          "<array of string #{TAG_RULE}>", []
+        oo.vArray M + "argument tags", tags, "<array of string #{TAG_RULE}>"
 
         tmp = {}
         for tag,i in tags
@@ -91,10 +206,11 @@ Check that the arguments are ok, and that `id` is unique.
             argument tags[#{i}] is a duplicate of tags[#{tmp[tag]}]"
           tmp[tag] = i
 
-Create a new Node instance, and fill the `previous` and `next` properties. 
+Create a new Node instance, and fill the `previous`, `next` and `id` properties. 
 
         tags.push 'node' # every node has the special 'node' tag
         node = new Node cargo
+        node.id = id
         for tag in tags
           node.previous[tag] = if @total[tag] then @tail[tag] else null
           node.next[tag] = null
@@ -117,31 +233,6 @@ Allow the node to be accessed by `id`, and return the `id`.
 
 
 
-#### `read()`
-- `id <string>`  an identifier, unique within this Listag
-- `<any>`        returns the node’s `cargo`
-
-Retrieves a node’s cargo. 
-
-      read: (id) ->
-        M = "/listag/src/Listag.litcoffee
-          Listag::read()\n  "
-
-Look up the Node, and check that `id` is valid. 
-
-        node = @[oo._]._nodes[id]
-        if oo.isU node
-          oo.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
-          throw RangeError M + "
-            the node with id '#{id}' does not exist"
-
-Return the cargo. 
-
-        return node.cargo
-
-
-
-
 #### `delete()`
 - `id <string>`  an identifier, unique within this Listag
 - `undefined`    does not return anything
@@ -156,7 +247,7 @@ Look up the Node, and check that `id` is valid.
 
         node = @[oo._]._nodes[id]
         if oo.isU node
-          oo.validator(M + "argument ", { id:id })("id <string #{ID_RULE}>")
+          oo.vArg M, id, "id <string #{ID_RULE}>"
           throw RangeError M + "
             the node with id '#{id}' does not exist"
 
