@@ -5,10 +5,12 @@ Listag
 
 
 ```
-         cat  red  dog
-tibbles  x    x
-fluffy   x
-fido          x    x
+id.......kind..cat..red..dog
+tibbles  Pet   x    x       
+fluffy   Pet   x            
+fido     Pet        x    x  
+
+
 
 
 .------------------------------------------------------------------------------.
@@ -45,8 +47,8 @@ fido          x    x
       toString: -> '[object Listag]'
 
       constructor: (config={}) ->
-        M = "/listag/src/Listag.litcoffee
-          Listag()\n  "
+        M = '/listag/src/Listag.litcoffee
+          Listag()\n  '
 
         oo.define @, oo._, {}, 'hid'
 
@@ -103,31 +105,25 @@ B.R.E.A.D. Methods
 Filters and formats `_nodes` in various ways. 
 
       browse: (config={}) ->
-        M = "/listag/src/Listag.litcoffee
-          Listag::browse()\n  "
+        M = '/listag/src/Listag.litcoffee
+          Listag::browse()\n  '
 
         v = oo.vObject M, 'config', config
         v 'format <string ^text|array$>', 'text'
+        config.tags = oo.vArray(M + 'config.tags', config.tags, 
+          "<array of string #{TAG_RULE}>", [])
 
 Deal with an empty Listag. 
 
         if ! @total.node
           return if 'array' == config.format then [] else '[empty]'
 
-Summarize the node metadata in an array, and find the longest id and type. 
+Summarize the node metadata. 
 
-        maxId   = 0
-        maxType = 0
-        meta    = []
-        node = @head.node
-        while node
-          tags = {}
-          tags[tag] = 'x' for tag of node.next
-          type = oo.type node.cargo
-          meta.push { id:node.id, tags:tags, type:type }
-          maxId   = if node.id.length > maxId   then node.id.length else maxId
-          maxType = if type.length    > maxType then type.length    else maxType
-          node = node.next.node
+        [meta, maxId, maxType, aToZtags] = if config.tags.length
+          summarizeAndFilterNodes @head.node, config.tags
+        else
+          summarizeNodes @head.node
 
 Deal with a request for metadata in 'array' format. 
 
@@ -135,13 +131,13 @@ Deal with a request for metadata in 'array' format.
 
 Otherwise, render the metadata as a text-based table, suitable for CLI output. 
 
-        row = oo.pad '', maxId + maxType + 2, '.'
-        (if 'node' != t then row += '..' + t) for t in Object.keys @total
+        row = oo.pad('id', maxId + 2, '.') + oo.pad('type', maxType, '.')
+        (if 'node' != t then row += '..' + t) for t in aToZtags
 
         out = [row]
         for node in meta
           row = oo.pad(node.id, maxId) + '  ' + oo.pad(node.type, maxType)
-          for t in Object.keys @total
+          for t in aToZtags
             if 'node' != t
               row += '  ' + oo.pad(node.tags[t] || ' ', t.length)
           out.push row
@@ -158,8 +154,8 @@ Otherwise, render the metadata as a text-based table, suitable for CLI output.
 Retrieves a node’s cargo. 
 
       read: (id) ->
-        M = "/listag/src/Listag.litcoffee
-          Listag::read()\n  "
+        M = '/listag/src/Listag.litcoffee
+          Listag::read()\n  '
 
 Look up the Node, and check that `id` is valid. 
 
@@ -185,8 +181,8 @@ Return the cargo.
 Creates a new Node instance in `_nodes`. 
 
       add: (cargo, id, tags=[]) ->
-        M = "/listag/src/Listag.litcoffee
-          Listag::add()\n  "
+        M = '/listag/src/Listag.litcoffee
+          Listag::add()\n  '
 
 Check that the arguments are ok, and that `id` is unique. 
 
@@ -196,7 +192,7 @@ Check that the arguments are ok, and that `id` is unique.
         if @[oo._]._nodes[id] then throw RangeError M + "
           a node with id '#{id}' already exists"
 
-        oo.vArray M + "argument tags", tags, "<array of string #{TAG_RULE}>"
+        oo.vArray M + 'argument tags', tags, "<array of string #{TAG_RULE}>"
 
         tmp = {}
         for tag,i in tags
@@ -206,7 +202,7 @@ Check that the arguments are ok, and that `id` is unique.
             argument tags[#{i}] is a duplicate of tags[#{tmp[tag]}]"
           tmp[tag] = i
 
-Create a new Node instance, and fill the `previous`, `next` and `id` properties. 
+Create a new Node instance, and fill the `previous`, `next` and `id` properties.
 
         tags.push 'node' # every node has the special 'node' tag
         node = new Node cargo
@@ -240,8 +236,8 @@ Allow the node to be accessed by `id`, and return the `id`.
 Removes a node from this Listag. 
 
       delete: (id) ->
-        M = "/listag/src/Listag.litcoffee
-          Listag::delete()\n  "
+        M = '/listag/src/Listag.litcoffee
+          Listag::delete()\n  '
 
 Look up the Node, and check that `id` is valid. 
 
@@ -259,14 +255,18 @@ referenced from anywhere else.
 
 Update the previous and next node in `_nodes`. 
 
-          if node.previous[tag] then node.previous[tag].next[tag] = node.next[tag]
-          if node.next[tag]     then node.next[tag].previous[tag] = node.previous[tag]
+          if node.previous[tag]
+            node.previous[tag].next[tag] = node.next[tag]
+          if node.next[tag]
+            node.next[tag].previous[tag] = node.previous[tag]
 
 Update the `total`, `head` and `tail` properties. 
 
           if --@total[tag]
-            if ! node.previous[tag] then @head[tag] = node.next[tag]
-            if ! node.next[tag]     then @tail[tag] = node.previous[tag]
+            if ! node.previous[tag]
+              @head[tag] = node.next[tag]
+            if ! node.next[tag]
+              @tail[tag] = node.previous[tag]
           else
             delete @total[tag]
             delete @head[tag]
@@ -289,10 +289,102 @@ Private Constants
 
 
 #### `ID_RULE, TAG_RULE <string>`
-Validates the `id` and `tags` arguments. 
+Used for validating the `id` and `tags` arguments. 
 
     ID_RULE  = '^[a-z]\\w{1,23}$'
     TAG_RULE = '^[a-z]\\w{1,23}$'
+
+
+
+
+Private Functions
+-----------------
+
+
+#### `summarizeNodes()`
+- `node <Node>`       The start-node, typically `@head.node`
+- `<array>`           contains four useful elements:
+  - `0 <object>`      `meta`, @todo describe
+  - `1 <array>`       `maxId`, @todo describe
+  - `2 <integer>`     `maxType`, @todo describe
+  - `3 <integer>`     `aToZtags`, @todo describe
+
+Rapidly summarizes all nodes, without performing any filtering. 
+
+    summarizeNodes = (node) ->
+      M = '/listag/src/Listag.litcoffee
+        summarizeNodes()\n  '
+
+Summarize the node metadata in an array, and find the longest id and type. 
+
+      meta     = []
+      maxId    = 2
+      maxType  = 4
+      aToZtags = {} # will contain all tags, sorted in alphabetical order
+      while node
+        metaTags = {}
+        for tag of node.next
+          metaTags[tag] = 'x'
+          aToZtags[tag] = 1
+        type = oo.type node.cargo
+        meta.push { id:node.id, tags:metaTags, type:type }
+        maxId   = Math.max maxId,   node.id.length
+        maxType = Math.max maxType, type.length
+        node = node.next.node
+
+Convert `aToZtags` from a hash to an array, and sort it in alphabetical order.  
+Return the four elements. 
+
+      return [ meta, maxId, maxType, Object.keys(aToZtags).sort() ]
+
+
+
+
+#### `summarizeAndFilterNodes()`
+- `node <Node>`       The start-node, typically `@head.node`
+- `tags <array>`      Tags to filter the result
+- `<array>`           contains four useful elements:
+  - `0 <object>`      `meta`, @todo describe
+  - `1 <array>`       `maxId`, @todo describe
+  - `2 <integer>`     `maxType`, @todo describe
+  - `3 <integer>`     `aToZtags`, @todo describe
+
+Summarizes all nodes, filtering by tag. Slower than `summarizeNodes()`. 
+
+    summarizeAndFilterNodes = (node, tags) ->
+      M = '/listag/src/Listag.litcoffee
+        summarizeAndFilterNodes()\n  '
+
+Prepare `tagFilters`, which will speed up filtering by tags. 
+
+      tagFilters = {}
+      tagFilters[tag] = 1 for tag in tags
+
+Summarize the node metadata in an array, and find the longest id and type. 
+
+      meta     = []
+      maxId    = 2
+      maxType  = 4
+      aToZtags = {} # will only contain tags from nodes which pass the filter
+      while node
+        passesFilter = false
+        metaTags = {}
+        for tag of node.next
+          metaTags[tag] = 'x'
+          if tagFilters[tag] then passesFilter = true
+        if passesFilter
+          type = oo.type node.cargo
+          meta.push { id:node.id, tags:metaTags, type:type }
+          maxId   = Math.max maxId,   node.id.length
+          maxType = Math.max maxType, type.length
+          for tag of node.next
+            aToZtags[tag] = 1
+        node = node.next.node
+
+Convert `aToZtags` from a hash to an array, and sort it in alphabetical order.  
+Return the four elements. 
+
+      return [ meta, maxId, maxType, Object.keys(aToZtags).sort() ]
 
 
 

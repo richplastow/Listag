@@ -3,8 +3,8 @@ Oopish Helpers
 
 #### Define the core Oopish helper functions
 
-Oopish’s helper functions are visible to all code defined in ‘src/’ and ‘test/’ 
-but are hidden from code defined elsewhere in the runtime environment. 
+Oopish helper functions are visible to all code defined in ‘src/’ and ‘test/’ 
+but are hidden from code defined elsewhere in the app. 
 
 - Helpers have no side-effects, other than throwing exceptions
 - They run identically in all modern environments (browser, server, desktop, …)
@@ -187,6 +187,10 @@ Check the type and rule.
 
           if pass then continue
           throw TypeError M + "[#{i}] is type #{tv} not #{types}"
+
+Return the valid array. 
+
+        return arr
 
 
 

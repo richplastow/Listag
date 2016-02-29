@@ -81,7 +81,7 @@ Prepare a test-instance.
 
       "For a populated Listag instance, `browse()` returns a table, as a string"
       """
-      ..................aa..bbbb
+      id.......type.....aa..bbbb
       the_1st  boolean  x   x   """
       (listag) ->
         listag.add true, 'the_1st', ['aa','bbbb']
@@ -97,7 +97,7 @@ Prepare a test-instance.
 
       "Empty object"
       """
-      .....................aa..bbbb..ccc
+      id..........type.....aa..bbbb..ccc
       the_1st     boolean  x   x        
       the_second  number       x     x  
       third       array                 
@@ -111,7 +111,7 @@ Prepare a test-instance.
 
       "Can contain arbitrary properties"
       """
-      .....................aa..bbbb..ccc
+      id..........type.....aa..bbbb..ccc
       the_1st     boolean  x   x        
       the_second  number       x     x  
       third       array                 
@@ -122,7 +122,7 @@ Prepare a test-instance.
 
       "Can be `null`"
       """
-      .....................aa..bbbb..ccc
+      id..........type.....aa..bbbb..ccc
       the_1st     boolean  x   x        
       the_second  number       x     x  
       third       array                 
@@ -133,7 +133,7 @@ Prepare a test-instance.
 
       "Can be `undefined`"
       """
-      .....................aa..bbbb..ccc
+      id..........type.....aa..bbbb..ccc
       the_1st     boolean  x   x        
       the_second  number       x     x  
       third       array                 
@@ -171,7 +171,7 @@ Prepare a test-instance.
 
       "The string 'text'"
       """
-      ....................bbbb..ccc
+      id..........type....bbbb..ccc
       the_second  number  x     x  
       third       array            
       fourth      regexp        x  """
@@ -223,6 +223,78 @@ Prepare a test-instance.
       /listag/src/Listag.litcoffee Listag::browse()
         config.format fails ^text|array$"""
       (listag) -> listag.browse { format:'Text' }
+
+
+
+
+      "`config.tags` usage"
+
+      tudor.equal
+
+
+      "An empty array"
+      """
+      id..........type....bbbb..ccc
+      the_second  number  x     x  
+      third       array            
+      fourth      regexp        x  """
+      (listag) ->
+        listag.browse { tags:[] }
+
+
+      "A single tag, text format"
+      """
+      id..........type....bbbb..ccc
+      the_second  number  x     x  
+      fourth      regexp        x  """
+      (listag) ->
+        listag.add true, 'the_1st', ['aa','bbbb']
+        listag.browse { tags:['ccc'] }
+
+
+      "A single tag, array format"
+      """
+      {"id":"the_second","tags":{"bbbb":"x","ccc":"x","node":"x"},"type":"number"}
+      {"id":"fourth","tags":{"ccc":"x","node":"x"},"type":"regexp"}"""
+      (listag) ->
+        nodes = listag.browse { tags:['ccc'], format:'array' }
+        out = ( JSON.stringify(node) for node in nodes )
+        out.join '\n'
+
+
+      "Two tags, text format"
+      """
+      id..........type.....aa..bbbb..ccc
+      the_second  number       x     x  
+      fourth      regexp             x  
+      the_1st     boolean  x   x        """
+      (listag) ->
+        listag.browse { tags:['aa','ccc'] }
+
+
+      "Two tags, array format"
+      """
+      {"id":"the_second","tags":{"bbbb":"x","ccc":"x","node":"x"},"type":"number"}
+      {"id":"fourth","tags":{"ccc":"x","node":"x"},"type":"regexp"}
+      {"id":"the_1st","tags":{"aa":"x","bbbb":"x","node":"x"},"type":"boolean"}"""
+      (listag) ->
+        nodes = listag.browse { tags:['aa','ccc'], format:'array' }
+        out = ( JSON.stringify(node) for node in nodes )
+        out.join '\n'
+
+
+
+
+      "`config.tags` exceptions"
+      tudor.throw
+
+
+      "Is number"
+      """
+      /listag/src/Listag.litcoffee Listag::browse()
+        config.tags is type number not array"""
+      (listag) -> listag.browse { tags:123 }
+
 
 
 

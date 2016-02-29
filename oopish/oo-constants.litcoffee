@@ -3,7 +3,7 @@ Oopish Constants
 
 #### Define the core Oopish constants
 
-Oopish’s constants are visible to all code defined in ‘src/’ and ‘test/’, but 
+Oopish constants are visible to all code defined in ‘src/’ and ‘test/’, but 
 hidden from code defined elsewhere in the app. 
 
 
@@ -21,16 +21,16 @@ make the source code less verbose: `oo.O == typeof x` vs `'object' == typeof x`.
     oo.D = 'document'
     oo.E = 'error'
     oo.F = 'function'
-    #       oo.G is the `global` context, see `oopish-build:ooTop()`
+    #       oo.G is the `global` context, see `oopish/bin/oopish-build:ooTop()`
     oo.I = 'integer'
     #       oo.M is not used, to avoid confusion with a method’s `M` variable
     oo.N = 'number'
     oo.O = 'object'
     oo.R = 'regexp'
     oo.S = 'string'
-    #       oo.T is the project title, see `oopish-build:ooTop()`
+    #       oo.T is the project title, see `oopish/bin/oopish-build:ooTop()`
     oo.U = 'undefined'
-    #       oo.V is the project version, see `oopish-build:ooTop()`
+    #       oo.V is the project version, see `oopish/bin/oopish-build:ooTop()`
     oo.X = 'null'
 
 

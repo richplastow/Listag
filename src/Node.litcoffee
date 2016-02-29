@@ -4,15 +4,15 @@ Node
 @todo describe
 
 
-#### Represents a single element in a Listag instance
+#### Represents a single element in a Listag instance’s `_nodes` object. 
 
     class Node
       C: 'Node'
       toString: -> '[object Node]'
 
       constructor: (cargo) ->
-        M = "/listag/src/Node.litcoffee
-          Node()\n  "
+        M = '/listag/src/Node.litcoffee
+          Node()\n  '
 
 
 
