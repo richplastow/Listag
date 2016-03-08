@@ -143,7 +143,7 @@ Validates an array.
 
 Get `types` and `rule` from the signature. 
 
-        matches = signature.match /^<array of ([|a-z]+)\s*(.*)>$/i
+        matches = signature.match /^<\[([|a-z]+)\s*(.*)\]>$/i
         if ! matches then throw RangeError "/listag/oopish/oo-helpers.litcoffee
           oo.vArray()\n  signature #{signature} is invalid"
         [signature, types, rule] = matches

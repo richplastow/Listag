@@ -18,7 +18,7 @@ make the source code less verbose: `oo.O == typeof x` vs `'object' == typeof x`.
     oo.A = 'array'
     oo.B = 'boolean'
     #       oo.C is not used, to avoid confusion with a class’s `C` property
-    oo.D = 'document'
+    oo.D = 'document' #@todo maybe 'defined' instead, ie not 'undefined'
     oo.E = 'error'
     oo.F = 'function'
     #       oo.G is the `global` context, see `oopish/bin/oopish-build:ooTop()`

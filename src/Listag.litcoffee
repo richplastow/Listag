@@ -87,7 +87,7 @@ Contains all Node instances currently held by this Listag instance.
 
 Prevent properties being accidentally modified or added to the instance. 
 
-        if 'Listag' == @C then oo.lock this
+        if 'Listag' == @C then oo.lock @
 
 
 
@@ -98,8 +98,8 @@ B.R.E.A.D. Methods
 
 #### `browse()`
 - `config <object> {}`  defines what to show, and how to show it
-  - `config.format <string> 'text'`  how to format the output @todo more
-  - `config.tags <array of string> ['node']`  only browse certain tags
+  - `config.format <string ^text|array$> 'text'`  how to format the output
+  - `config.tags <[string]> []`                   only browse certain tags
 - `<array|string>`  the return type depends on `config.format`
 
 Filters and formats `_nodes` in various ways. 
@@ -111,7 +111,7 @@ Filters and formats `_nodes` in various ways.
         v = oo.vObject M, 'config', config
         v 'format <string ^text|array$>', 'text'
         config.tags = oo.vArray(M + 'config.tags', config.tags, 
-          "<array of string #{TAG_RULE}>", [])
+          "<[string #{TAG_RULE}]>", [])
 
 Deal with an empty Listag. 
 
@@ -125,7 +125,7 @@ Summarize the node metadata.
         else
           summarizeNodes @head.node
 
-Deal with a request for metadata in 'array' format. 
+Deal with a request for metadata in 'array' format. @todo more formats
 
         if 'array' == config.format then return meta
 
@@ -172,11 +172,133 @@ Return the cargo.
 
 
 
+#### `edit()`
+- `id <string>`               an identifier, unique within this Listag
+- `config <object> {}`        defines what to modify
+  - `config.cargo <any>`      replacement for the current cargo, can be any type
+  - `config.tags <[string]>`  replacement for the current tags
+- `undefined`                 does not return anything
+
+Modifies a node’s tags or cargo. 
+
+      edit: (id, config={}) ->
+        M = '/listag/src/Listag.litcoffee
+          Listag::edit()\n  '
+
+Look up the Node, and check that the arguments are valid. 
+
+        node = @[oo._]._nodes[id]
+        if oo.isU node
+          oo.vArg M, id, "id <string #{ID_RULE}>"
+          throw RangeError M + "
+            the node with id '#{id}' does not exist"
+
+        v = oo.vObject M, 'config', config
+        if config.tags
+          oo.vArray M + 'config.tags', config.tags, "<[string #{TAG_RULE}]>"
+          tmp = {}
+          for tag,i in config.tags
+            if 'node' == tag then throw RangeError M + "
+              config.tags[#{i}] is the special tag 'node'"
+            unless oo.isU tmp[tag] then throw RangeError M + "
+              config.tags[#{i}] is a duplicate of config.tags[#{tmp[tag]}]"
+            tmp[tag] = i
+
+Replace cargo if `config.cargo` exists - note that it may be set to `undefined`.
+
+        if 0 <= Object.keys(config).indexOf 'cargo' #@todo polyfill MSIE8 and earlier
+          node.cargo = config.cargo
+
+Process `config.tags`, if set. 
+
+        if config.tags
+
+Remove existing tags which are not in `config.tags`. 
+
+          for tag of node.next
+            if 'node' == tag or 0 <= config.tags.indexOf tag then continue
+
+If a tag only exists in the edited node, remove it from the `total`, `head` and 
+`tail` properties. Otherwise, just update `total`, `head` and `tail`. 
+
+            if --@total[tag]
+              if ! node.previous[tag] # no previous node...
+                @head[tag] = node.next[tag] # ...so the head changes
+              if ! node.next[tag] # no next node...
+                @tail[tag] = node.previous[tag] # ...so the tail changes
+            else
+              delete @total[tag]
+              delete @head[tag]
+              delete @tail[tag]
+
+Update the previous and next node. 
+
+            if node.previous[tag]
+              node.previous[tag].next[tag] = node.next[tag]
+            if node.next[tag]
+              node.next[tag].previous[tag] = node.previous[tag]
+
+Remove the tag from the edited node. 
+
+            delete node.previous[tag]
+            delete node.next[tag]
+
+Add new tags from the `config.tags` array if they don’t already exist. 
+
+          for tag in config.tags
+            unless oo.isU node.next[tag] then continue
+
+If the new tag is _not_ already in use, it can be inserted very easily...
+
+            unless @total[tag]
+              @total[tag] = 1
+              @head[tag] = node
+              @tail[tag] = node
+              node.previous[tag] = null
+              node.next[tag]     = null
+
+...otherwise, we need to find the previous and next nodes with the new tag, so 
+that we can insert this node inbetween. 
+
+            else
+              @total[tag]++
+              prevNode = node.previous.node # begin with the previous node...
+              while prevNode # ...and loop ‘headwards’ until `@head.node`
+                if oo.isU nextNode = prevNode.next[tag] # tag not on prev node
+                  prevNode = prevNode.previous.node # make one step headwards
+                  continue
+                prevNode.next[tag] = node # found the previous tagged node
+                node.previous[tag] = prevNode
+                node.next[tag]     = nextNode
+                if nextNode # `nextNode` is a node
+                  nextNode.previous[tag] = node
+                else # `nextNode` is `null`
+                  @tail[tag] = node
+                break
+              unless node.previous[tag] # didn’t find the tagged node backwards
+                node.previous[tag] = null
+                @head[tag] = node
+                nextNode = node.next.node
+                while nextNode
+                  if oo.isU prevNode = nextNode.previous[tag] # not on next node
+                    nextNode = nextNode.next.node
+                    continue
+                  nextNode.previous[tag] = node
+                  node.next[tag]         = nextNode
+                  break
+
+Do not return anything. 
+
+        return undefined
+
+
+
+
 #### `add()`
-- `cargo <any>`             the new Node’s payload, can be any type
-- `id <string>`             (optional) an identifier (generated if missing)
-- `tags <array of string>`  (optional) must not be the special string 'node'
-- `<string>`                returns the newly-added object’s identifier
+- `cargo <any>`      the new Node’s payload, can be any type
+- `id <string>`      (optional) an identifier (generated if missing)
+- `tags <[string]>`  (optional) must not be the special string 'node'
+- `<string>`         returns the newly-added object’s identifier
 
 Creates a new Node instance in `_nodes`. 
 
@@ -192,7 +314,7 @@ Check that the arguments are ok, and that `id` is unique.
         if @[oo._]._nodes[id] then throw RangeError M + "
           a node with id '#{id}' already exists"
 
-        oo.vArray M + 'argument tags', tags, "<array of string #{TAG_RULE}>"
+        oo.vArray M + 'argument tags', tags, "<[string #{TAG_RULE}]>"
 
         tmp = {}
         for tag,i in tags
@@ -202,11 +324,10 @@ Check that the arguments are ok, and that `id` is unique.
             argument tags[#{i}] is a duplicate of tags[#{tmp[tag]}]"
           tmp[tag] = i
 
-Create a new Node instance, and fill the `previous`, `next` and `id` properties.
+Create a new Node instance, and fill the `previous` and `next`. 
 
         tags.push 'node' # every node has the special 'node' tag
-        node = new Node cargo
-        node.id = id
+        node = new Node cargo, id
         for tag in tags
           node.previous[tag] = if @total[tag] then @tail[tag] else null
           node.next[tag] = null
@@ -301,8 +422,47 @@ Private Functions
 -----------------
 
 
+#### `removeTag()`
+- `listag <Listag>`  a Listag instance to remove the tag from, typically `this`
+- `tag <string>`     the tag which should be removed
+- `undefined`        does not return anything
+
+@todo use this function  
+Removes all traces of a tag from a Listag instance, and all its Node instances. 
+
+    removeTag = (listag, tag) ->
+      M = '/listag/src/Listag.litcoffee
+        removeTag()\n  '
+
+This is a private function, so we don’t need to validate arguments. However, 
+it’s very important that the special 'node' tag is not removed, so just in case:
+
+      if 'node' == tag then return
+
+Remove the tag from each Node instance. 
+
+      node = listag.head[tag]
+      while node
+        nextNode = node.next[tag]
+        delete node.previous[tag]
+        delete node.next[tag]
+        node = nextNode
+
+Remove the tag from the `total`, `head` and `tail` properties. 
+
+      delete listag.total[tag]
+      delete listag.head[tag]
+      delete listag.tail[tag]
+
+Do not return anything. 
+
+      return undefined
+
+
+
+
 #### `summarizeNodes()`
-- `node <Node>`       The start-node, typically `@head.node`
+- `node <Node>`       the start-node, typically `@head.node`
 - `<array>`           contains four useful elements:
   - `0 <object>`      `meta`, @todo describe
   - `1 <array>`       `maxId`, @todo describe
@@ -341,8 +501,8 @@ Return the four elements.
 
 
 #### `summarizeAndFilterNodes()`
-- `node <Node>`       The start-node, typically `@head.node`
-- `tags <array>`      Tags to filter the result
+- `node <Node>`       the start-node, typically `@head.node`
+- `tags <array>`      tags to filter the result
 - `<array>`           contains four useful elements:
   - `0 <object>`      `meta`, @todo describe
   - `1 <array>`       `maxId`, @todo describe

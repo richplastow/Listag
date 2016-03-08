@@ -39,8 +39,6 @@ Prepare a test-instance.
 
 
 
-
-
       "The `node` argument accepts objects as expected"
 
 
@@ -64,9 +62,6 @@ Prepare a test-instance.
 
 
 @todo more allowed node objects, and also other types
-
-
-
 
 
 

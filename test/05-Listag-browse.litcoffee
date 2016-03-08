@@ -9,7 +9,7 @@
 
 
 
-      "`browse()` is a function which returns a string" #@todo or an array
+      "`browse()` is a function which returns a string or an array"
 
 Prepare a test-instance. 
 

@@ -10,7 +10,7 @@ Node
       C: 'Node'
       toString: -> '[object Node]'
 
-      constructor: (cargo) ->
+      constructor: (cargo, id) ->
         M = '/listag/src/Node.litcoffee
           Node()\n  '
 
@@ -26,6 +26,12 @@ Properties
 
         @previous = {}
         @next     = {}
+
+
+#### `id <string>`
+@todo describe
+
+        @id = id
 
 
 #### `cargo <any>`
