@@ -148,6 +148,13 @@ Prepare a test-instance.
       tudor.throw
 
 
+      "Is a regexp"
+      """
+      /listag/src/Listag.litcoffee Listag::browse()
+        config is type regexp not object"""
+      (listag) -> listag.browse /abc/
+
+
       "Is boolean"
       """
       /listag/src/Listag.litcoffee Listag::browse()

@@ -600,6 +600,26 @@ Listag = (function() {
     return void 0;
   };
 
+  Listag.prototype.each = function(config) {
+    var M, args, ctx, fn, ids, node, tags, v;
+    if (config == null) {
+      config = {};
+    }
+    M = '/listag/src/Listag.litcoffee Listag::each()\n  ';
+    v = oo.vObject(M, 'config', config);
+    fn = v('fn <function>', null);
+    ctx = v('ctx <object>', null);
+    args = v('args <array>', []);
+    tags = oo.vArray(M + 'config.tags', config.tags, "<[string " + TAG_RULE + "]>", []);
+    ids = oo.vArray(M + 'config.tags', config.ids, "<[string " + ID_RULE + "]>", []);
+    node = this.head.node;
+    while (node) {
+      node.cargo.apply(ctx, args);
+      node = node.next.node;
+    }
+    return void 0;
+  };
+
   return Listag;
 
 })();

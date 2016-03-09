@@ -601,6 +601,26 @@ Listag = (function() {
     return void 0;
   };
 
+  Listag.prototype.each = function(config) {
+    var M, args, ctx, fn, ids, node, tags, v;
+    if (config == null) {
+      config = {};
+    }
+    M = '/listag/src/Listag.litcoffee Listag::each()\n  ';
+    v = oo.vObject(M, 'config', config);
+    fn = v('fn <function>', null);
+    ctx = v('ctx <object>', null);
+    args = v('args <array>', []);
+    tags = oo.vArray(M + 'config.tags', config.tags, "<[string " + TAG_RULE + "]>", []);
+    ids = oo.vArray(M + 'config.tags', config.ids, "<[string " + ID_RULE + "]>", []);
+    node = this.head.node;
+    while (node) {
+      node.cargo.apply(ctx, args);
+      node = node.next.node;
+    }
+    return void 0;
+  };
+
   return Listag;
 
 })();
@@ -1455,7 +1475,9 @@ tudor.add([
     return listag.browse(null);
   }, "Can be `undefined`", "i..id..........type.....aa..bbbb..ccc\n1  the_1st     boolean  1   1        \n2  the_second  number       2     1  \n3  third       array                 \n4  fourth      regexp             2  ", function(listag) {
     return listag.browse(void 0);
-  }, "`config` exceptions", tudor["throw"], "Is boolean", "/listag/src/Listag.litcoffee Listag::browse()\n  config is type boolean not object", function(listag) {
+  }, "`config` exceptions", tudor["throw"], "Is a regexp", "/listag/src/Listag.litcoffee Listag::browse()\n  config is type regexp not object", function(listag) {
+    return listag.browse(/abc/);
+  }, "Is boolean", "/listag/src/Listag.litcoffee Listag::browse()\n  config is type boolean not object", function(listag) {
     return listag.browse(true);
   }, "Is an array", "/listag/src/Listag.litcoffee Listag::browse()\n  config is type array not object", function(listag) {
     return listag.browse([1, 2, 3]);
@@ -1629,6 +1651,10 @@ tudor.add([
     return listag.edit('ab-c');
   }, "Does not exist", "/listag/src/Listag.litcoffee Listag::edit()\n  the node with id 'non_existant' does not exist", function(listag) {
     return listag.edit('non_existant');
+  }, "`config` exceptions", tudor["throw"], "Is a `Date` instance", "/listag/src/Listag.litcoffee Listag::edit()\n  config is type date not object", function(listag) {
+    return listag.edit('the_first', new Date());
+  }, "Is a number", "/listag/src/Listag.litcoffee Listag::edit()\n  config is type number not object", function(listag) {
+    return listag.edit('the_first', 123);
   }, "`config.tags` accepts an array as expected", tudor.equal, "Straightforward addition of a single tag", "i..id.........type.......aa\n1  the_first  undefined  1 \nnode:1 aa:1 bb:0 cc:0", function(listag) {
     listag.edit('the_first', {
       tags: ['aa']
@@ -1733,6 +1759,59 @@ tudor.add([
     return listag.edit('the_first', {
       tags: ['aa', 'bb', 'aa', 'aa', 'bb']
     });
+  }
+]);
+
+tudor.add([
+  "07 Listag::each()", tudor.is, "`each()` is a function which returns a xx", function() {
+    return [new Listag, {}];
+  }, "`each()` is a function", oo.F, function(listag) {
+    return listag.each;
+  }, "`each()` is not writable", oo.F, function(listag) {
+    listag.each = 123;
+    return listag.each;
+  }, "`each()` is not configurable", oo.F, function(listag) {
+    var e;
+    try {
+      Object.defineProperty(listag, 'each', {
+        writable: true
+      });
+    } catch (_error) {
+      e = _error;
+    }
+    listag.each = 'nope';
+    return listag.each;
+  }, "`each()` cannot be replaced by another method using `prototype`", oo.U, function() {
+    var listag;
+    Listag.prototype.each = function() {
+      return 123;
+    };
+    listag = new Listag;
+    return listag.each();
+  }, "`each()` cannot be replaced by another method using direct-access", oo.U, function(listag) {
+    listag.each = function() {
+      return [];
+    };
+    return listag.each();
+  }, "`each()` returns `undefined`", oo.U, function(listag) {
+    return listag.each();
+  }, tudor.equal, "`each()` with a single node, containing a function as its cargo", 1, function(listag, ctx) {
+    ctx.runTally = 0;
+    listag.add((function() {
+      return ctx.runTally++;
+    }), 'the_1st');
+    listag.each();
+    return ctx.runTally;
+  }, "`each()` with three nodes, all containing functions as cargo", 134, function(listag, ctx) {
+    ctx.runTally = 0;
+    listag.add((function() {
+      return ctx.runTally += 10;
+    }), 'the_2nd');
+    listag.add((function() {
+      return ctx.runTally += 123;
+    }), 'the_3rd');
+    listag.each();
+    return ctx.runTally;
   }
 ]);
 

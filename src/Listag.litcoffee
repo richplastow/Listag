@@ -108,6 +108,8 @@ Filters and formats `_nodes` in various ways.
         M = '/listag/src/Listag.litcoffee
           Listag::browse()\n  '
 
+Check that `config` is valid, and provide fallback values. 
+
         v = oo.vObject M, 'config', config
         v 'format <string ^text|array$>', 'text'
         config.tags = oo.vArray(M + 'config.tags', config.tags, 
@@ -409,6 +411,57 @@ Delete the Item from `_nodes`.
 Do not return anything. 
 
         return undefined
+
+
+
+
+Other Public Methods
+--------------------
+
+
+#### `each()`
+- `config <object> {}`          (Optional) @todo describe
+  - `config.fn <function>`      (Optional) will be run on each node
+  - `config.ctx <object>`       (Optional) context to run the function in
+  - `config.args <array>`       (Optional) arguments to pass to the function
+  - `config.tags <[string]>`    (Optional) only run on nodes with these tags
+  - `config.ids <[string]>`     (Optional) only run on nodes with these ids
+  - `config.reverse <boolean>`  (Optional) defaults to `false`
+- `undefined`                   does not return anything
+
+If `config.fn` is not set, `each()` assumes that each node’s cargo is a function
+and calls it, passing `config.args` as arguments. 
+
+If `config.fn` is a function, `each()` calls that function once for each node, 
+passing the node’s cargo in as the first argument, and `config.args` as the 
+remaining arguments. 
+
+      each: (config={}) ->
+        M = '/listag/src/Listag.litcoffee
+          Listag::each()\n  '
+
+Check that `config` is valid, and provide fallback values. 
+
+        v = oo.vObject M, 'config', config
+        fn   = v 'fn <function>', null
+        ctx  = v 'ctx <object>' , null
+        args = v 'args <array>' , []
+        tags = oo.vArray(M + 'config.tags', config.tags, 
+          "<[string #{TAG_RULE}]>", [])
+        ids  = oo.vArray(M + 'config.tags', config.ids, 
+          "<[string #{ID_RULE}]>", [])
+
+Xx. @todo describe
+
+        node = @head.node
+        while node
+          node.cargo.apply ctx, args
+          node = node.next.node
+
+Do not return anything. 
+
+        return undefined
+
 
 
 

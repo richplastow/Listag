@@ -164,6 +164,26 @@ Prepare a test-instance.
 
 
 
+      "`config` exceptions"
+      tudor.throw
+
+
+      "Is a `Date` instance"
+      """
+      /listag/src/Listag.litcoffee Listag::edit()
+        config is type date not object"""
+      (listag) -> listag.edit 'the_first', new Date()
+
+
+      "Is a number"
+      """
+      /listag/src/Listag.litcoffee Listag::edit()
+        config is type number not object"""
+      (listag) -> listag.edit 'the_first', 123
+
+
+
+
       "`config.tags` accepts an array as expected"
       tudor.equal
 
