@@ -131,12 +131,20 @@ Deal with a request for metadata in 'array' format. @todo more formats
 
 Otherwise, render the metadata as a text-based table, suitable for CLI output. 
 
-        row = oo.pad('id', maxId + 2, '.') + oo.pad('type', maxType, '.')
+        if 0 == meta.length then return '[no matches]'
+        maxI = (@total.node+'').length
+        row =
+          oo.pad('i'   , maxI  + 2, '.') +
+          oo.pad('id'  , maxId + 2, '.') +
+          oo.pad('type', maxType  , '.')
         (if 'node' != t then row += '..' + t) for t in aToZtags
 
         out = [row]
         for node in meta
-          row = oo.pad(node.id, maxId) + '  ' + oo.pad(node.type, maxType)
+          row =
+            oo.pad(node.i+'', maxI)  + '  ' +
+            oo.pad(node.id,   maxId) + '  ' +
+            oo.pad(node.type, maxType)
           for t in aToZtags
             if 'node' != t
               row += '  ' + oo.pad(node.tags[t] || ' ', t.length)
@@ -428,7 +436,7 @@ Private Functions
 - `undefined`        does not return anything
 
 @todo use this function  
-Removes all traces of a tag from a Listag instance, and all its Node instances. 
+Removes all traces of a tag from a Listag instance. 
 
     removeTag = (listag, tag) ->
       M = '/listag/src/Listag.litcoffee
@@ -463,11 +471,11 @@ Do not return anything.
 
 #### `summarizeNodes()`
 - `node <Node>`       the start-node, typically `@head.node`
-- `<array>`           contains four useful elements:
+- `<object>`          contains four useful elements:
   - `0 <object>`      `meta`, @todo describe
   - `1 <array>`       `maxId`, @todo describe
   - `2 <integer>`     `maxType`, @todo describe
-  - `3 <integer>`     `aToZtags`, @todo describe
+  - `3 <array>`       `aToZtags`, @todo describe
 
 Rapidly summarizes all nodes, without performing any filtering. 
 
@@ -481,13 +489,15 @@ Summarize the node metadata in an array, and find the longest id and type.
       maxId    = 2
       maxType  = 4
       aToZtags = {} # will contain all tags, sorted in alphabetical order
+      i        = 0
       while node
+        i++
         metaTags = {}
         for tag of node.next
-          metaTags[tag] = 'x'
-          aToZtags[tag] = 1
+          aToZtags[tag] = if aToZtags[tag] then aToZtags[tag] + 1 else 1
+          metaTags[tag] = aToZtags[tag]+''
         type = oo.type node.cargo
-        meta.push { id:node.id, tags:metaTags, type:type }
+        meta.push { i:i, id:node.id, tags:metaTags, type:type }
         maxId   = Math.max maxId,   node.id.length
         maxType = Math.max maxType, type.length
         node = node.next.node
@@ -507,7 +517,7 @@ Return the four elements.
   - `0 <object>`      `meta`, @todo describe
   - `1 <array>`       `maxId`, @todo describe
   - `2 <integer>`     `maxType`, @todo describe
-  - `3 <integer>`     `aToZtags`, @todo describe
+  - `3 <array>`       `aToZtags`, @todo describe
 
 Summarizes all nodes, filtering by tag. Slower than `summarizeNodes()`. 
 
@@ -526,19 +536,21 @@ Summarize the node metadata in an array, and find the longest id and type.
       maxId    = 2
       maxType  = 4
       aToZtags = {} # will only contain tags from nodes which pass the filter
+      i        = 0
       while node
+        i++
         passesFilter = false
         metaTags = {}
         for tag of node.next
-          metaTags[tag] = 'x'
           if tagFilters[tag] then passesFilter = true
         if passesFilter
+          for tag of node.next
+            aToZtags[tag] = if aToZtags[tag] then aToZtags[tag] + 1 else 1
+            metaTags[tag] = aToZtags[tag]+''
           type = oo.type node.cargo
-          meta.push { id:node.id, tags:metaTags, type:type }
+          meta.push { i:i, id:node.id, tags:metaTags, type:type }
           maxId   = Math.max maxId,   node.id.length
           maxType = Math.max maxType, type.length
-          for tag of node.next
-            aToZtags[tag] = 1
         node = node.next.node
 
 Convert `aToZtags` from a hash to an array, and sort it in alphabetical order.  

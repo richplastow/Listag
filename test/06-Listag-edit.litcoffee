@@ -92,8 +92,8 @@ Prepare a test-instance.
 
       "`config.cargo` can be changed to `undefined`"
       """
-      id.........type.....
-      the_first  undefined"""
+      i..id.........type.....
+      1  the_first  undefined"""
       (listag) ->
         listag.edit 'the_first', { cargo:undefined }
         listag.browse()
@@ -170,8 +170,8 @@ Prepare a test-instance.
 
       "Straightforward addition of a single tag"
       """
-      id.........type.......aa
-      the_first  undefined  x 
+      i..id.........type.......aa
+      1  the_first  undefined  1 
       node:1 aa:1 bb:0 cc:0"""
       (listag) ->
         listag.edit 'the_first', { tags:['aa'] }
@@ -181,8 +181,8 @@ Prepare a test-instance.
 
       "Without a `config.tags` property, nothing changes"
       """
-      id.........type.......aa
-      the_first  undefined  x 
+      i..id.........type.......aa
+      1  the_first  undefined  1 
       node:1 aa:1 bb:0 cc:0"""
       (listag) ->
         listag.edit 'the_first', {}
@@ -192,8 +192,8 @@ Prepare a test-instance.
 
       "With an empty `config.tags` array, no tags remain"
       """
-      id.........type.....
-      the_first  undefined
+      i..id.........type.....
+      1  the_first  undefined
       node:1 aa:0 bb:0 cc:0"""
       (listag) ->
         listag.edit 'the_first', { tags:[] }
@@ -203,8 +203,8 @@ Prepare a test-instance.
 
       "Two tags can be added at once (also, changing cargo during edit)"
       """
-      id.........type....aa..bb
-      the_first  number  x   x 
+      i..id.........type....aa..bb
+      1  the_first  number  1   1 
       node:1 aa:1 bb:1 cc:0
 
       head.node: the_first
@@ -257,8 +257,8 @@ Prepare a test-instance.
 
       "Removal of a single tag - was `['aa', 'bb']`, now `['bb']`"
       """
-      id.........type....bb
-      the_first  number  x 
+      i..id.........type....bb
+      1  the_first  number  1 
       node:1 aa:0 bb:1 cc:0"""
       (listag) ->
         listag.edit 'the_first', { tags:['bb'] }
@@ -268,8 +268,8 @@ Prepare a test-instance.
 
       "Without a `config.tags` property (but changing cargo), tags do not change"
       """
-      id.........type....bb
-      the_first  string  x 
+      i..id.........type....bb
+      1  the_first  string  1 
       node:1 aa:0 bb:1 cc:0"""
       (listag) ->
         listag.edit 'the_first', { cargo:'ok' }
@@ -279,8 +279,8 @@ Prepare a test-instance.
 
       "With an empty `config.tags` array (but changing cargo), no tags remain"
       """
-      id.........type..
-      the_first  number
+      i..id.........type..
+      1  the_first  number
       node:1 aa:0 bb:0 cc:0"""
       (listag) ->
         listag.edit 'the_first', { cargo:123, tags:[] }
@@ -290,9 +290,9 @@ Prepare a test-instance.
 
       "An array with arbitrary properties - also, added another node"
       """
-      id..........type....aa..bb..cc
-      the_first   number  x   x     
-      the_second  number  x       x 
+      i..id..........type....aa..bb..cc
+      1  the_first   number  1   1     
+      2  the_second  number  2       1 
       node:2 aa:2 bb:1 cc:1
 
       head.node: the_first
@@ -349,9 +349,9 @@ Prepare a test-instance.
 
       "After editing a node’s tags, `head`, `tail`, `previous` and `next` are as expected"
       """
-      id..........type....aa..bb..cc
-      the_first   number  x   x     
-      the_second  number      x   x 
+      i..id..........type....aa..bb..cc
+      1  the_first   number  1   1     
+      2  the_second  number      2   1 
       node:2 aa:1 bb:2 cc:1
 
       head.node: the_first
@@ -405,9 +405,9 @@ Prepare a test-instance.
 
       "More tag editing still produces proper `head`, `tail`, `previous` and `next`"
       """
-      id..........type....aa..bb..cc
-      the_first   number  x       x 
-      the_second  number      x   x 
+      i..id..........type....aa..bb..cc
+      1  the_first   number  1       1 
+      2  the_second  number      1   2 
       node:2 aa:1 bb:1 cc:2
 
       head.node: the_first

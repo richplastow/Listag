@@ -81,8 +81,8 @@ Prepare a test-instance.
 
       "For a populated Listag instance, `browse()` returns a table, as a string"
       """
-      id.......type.....aa..bbbb
-      the_1st  boolean  x   x   """
+      i..id.......type.....aa..bbbb
+      1  the_1st  boolean  1   1   """
       (listag) ->
         listag.add true, 'the_1st', ['aa','bbbb']
         listag.browse()
@@ -97,11 +97,11 @@ Prepare a test-instance.
 
       "Empty object"
       """
-      id..........type.....aa..bbbb..ccc
-      the_1st     boolean  x   x        
-      the_second  number       x     x  
-      third       array                 
-      fourth      regexp             x  """
+      i..id..........type.....aa..bbbb..ccc
+      1  the_1st     boolean  1   1        
+      2  the_second  number       2     1  
+      3  third       array                 
+      4  fourth      regexp             2  """
       (listag) ->
         listag.add 222, 'the_second', ['bbbb','ccc']
         listag.add [3], 'third'
@@ -111,33 +111,33 @@ Prepare a test-instance.
 
       "Can contain arbitrary properties"
       """
-      id..........type.....aa..bbbb..ccc
-      the_1st     boolean  x   x        
-      the_second  number       x     x  
-      third       array                 
-      fourth      regexp             x  """
+      i..id..........type.....aa..bbbb..ccc
+      1  the_1st     boolean  1   1        
+      2  the_second  number       2     1  
+      3  third       array                 
+      4  fourth      regexp             2  """
       (listag) ->
         listag.browse { a:1, '-!•':'ok' }
 
 
       "Can be `null`"
       """
-      id..........type.....aa..bbbb..ccc
-      the_1st     boolean  x   x        
-      the_second  number       x     x  
-      third       array                 
-      fourth      regexp             x  """
+      i..id..........type.....aa..bbbb..ccc
+      1  the_1st     boolean  1   1        
+      2  the_second  number       2     1  
+      3  third       array                 
+      4  fourth      regexp             2  """
       (listag) ->
         listag.browse null
 
 
       "Can be `undefined`"
       """
-      id..........type.....aa..bbbb..ccc
-      the_1st     boolean  x   x        
-      the_second  number       x     x  
-      third       array                 
-      fourth      regexp             x  """
+      i..id..........type.....aa..bbbb..ccc
+      1  the_1st     boolean  1   1        
+      2  the_second  number       2     1  
+      3  third       array                 
+      4  fourth      regexp             2  """
       (listag) ->
         listag.browse undefined
 
@@ -171,10 +171,10 @@ Prepare a test-instance.
 
       "The string 'text'"
       """
-      id..........type....bbbb..ccc
-      the_second  number  x     x  
-      third       array            
-      fourth      regexp        x  """
+      i..id..........type....bbbb..ccc
+      1  the_second  number  1     1  
+      2  third       array            
+      3  fourth      regexp        2  """
       (listag) ->
         listag.delete 'the_1st'
         listag.browse { format:'text' }
@@ -182,9 +182,9 @@ Prepare a test-instance.
 
       "The string 'array'"
       """
-      {"id":"the_second","tags":{"bbbb":"x","ccc":"x","node":"x"},"type":"number"}
-      {"id":"third","tags":{"node":"x"},"type":"array"}
-      {"id":"fourth","tags":{"ccc":"x","node":"x"},"type":"regexp"}"""
+      {"i":1,"id":"the_second","tags":{"bbbb":"1","ccc":"1","node":"1"},"type":"number"}
+      {"i":2,"id":"third","tags":{"node":"2"},"type":"array"}
+      {"i":3,"id":"fourth","tags":{"ccc":"2","node":"3"},"type":"regexp"}"""
       (listag) ->
         nodes = listag.browse { format:'array' }
         out = ( JSON.stringify(node) for node in nodes )
@@ -234,19 +234,19 @@ Prepare a test-instance.
 
       "An empty array"
       """
-      id..........type....bbbb..ccc
-      the_second  number  x     x  
-      third       array            
-      fourth      regexp        x  """
+      i..id..........type....bbbb..ccc
+      1  the_second  number  1     1  
+      2  third       array            
+      3  fourth      regexp        2  """
       (listag) ->
         listag.browse { tags:[] }
 
 
       "A single tag, text format"
       """
-      id..........type....bbbb..ccc
-      the_second  number  x     x  
-      fourth      regexp        x  """
+      i..id..........type....bbbb..ccc
+      1  the_second  number  1     1  
+      3  fourth      regexp        2  """
       (listag) ->
         listag.add true, 'the_1st', ['aa','bbbb']
         listag.browse { tags:['ccc'] }
@@ -254,8 +254,8 @@ Prepare a test-instance.
 
       "A single tag, array format"
       """
-      {"id":"the_second","tags":{"bbbb":"x","ccc":"x","node":"x"},"type":"number"}
-      {"id":"fourth","tags":{"ccc":"x","node":"x"},"type":"regexp"}"""
+      {"i":1,"id":"the_second","tags":{"bbbb":"1","ccc":"1","node":"1"},"type":"number"}
+      {"i":3,"id":"fourth","tags":{"ccc":"2","node":"2"},"type":"regexp"}"""
       (listag) ->
         nodes = listag.browse { tags:['ccc'], format:'array' }
         out = ( JSON.stringify(node) for node in nodes )
@@ -264,23 +264,36 @@ Prepare a test-instance.
 
       "Two tags, text format"
       """
-      id..........type.....aa..bbbb..ccc
-      the_second  number       x     x  
-      fourth      regexp             x  
-      the_1st     boolean  x   x        """
+      i..id..........type.....aa..bbbb..ccc
+      1  the_second  number       1     1  
+      3  fourth      regexp             2  
+      4  the_1st     boolean  1   2        """
       (listag) ->
         listag.browse { tags:['aa','ccc'] }
 
 
       "Two tags, array format"
       """
-      {"id":"the_second","tags":{"bbbb":"x","ccc":"x","node":"x"},"type":"number"}
-      {"id":"fourth","tags":{"ccc":"x","node":"x"},"type":"regexp"}
-      {"id":"the_1st","tags":{"aa":"x","bbbb":"x","node":"x"},"type":"boolean"}"""
+      {"i":1,"id":"the_second","tags":{"bbbb":"1","ccc":"1","node":"1"},"type":"number"}
+      {"i":3,"id":"fourth","tags":{"ccc":"2","node":"2"},"type":"regexp"}
+      {"i":4,"id":"the_1st","tags":{"aa":"1","bbbb":"2","node":"3"},"type":"boolean"}"""
       (listag) ->
         nodes = listag.browse { tags:['aa','ccc'], format:'array' }
         out = ( JSON.stringify(node) for node in nodes )
         out.join '\n'
+
+
+      "Tag which does not exist, text format"
+      '[no matches]'
+      (listag) ->
+        listag.browse { tags:['non_existant'] }
+
+
+      "Tag which does not exist, array format"
+      0
+      (listag) ->
+        nodes = listag.browse { tags:['non_existant'], format:'array' }
+        nodes.length
 
 
 
